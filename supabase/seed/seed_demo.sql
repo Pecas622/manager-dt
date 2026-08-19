@@ -144,13 +144,21 @@ on conflict (id) do update set
   video_url = excluded.video_url, image_url = excluded.image_url, instructions = excluded.instructions;
 
 -- =========================================================
--- routines (3) — prefijo 80000000-0000-0000-0000-0000000000xx
+-- routines (3 de plantilla + 1 plan individual) — prefijo 80000000-0000-0000-0000-0000000000xx
+-- La última (...004) es un Plan Individual: player_id seteado (Ignacio
+-- Torres), privada de él, con metadata de plan. Requiere haber corrido
+-- 0027_individual_plans_as_routines.sql.
 -- =========================================================
-insert into routines (id, name, notes, created_by) values
-('80000000-0000-0000-0000-000000000001', 'Fuerza de piernas', 'Rutina de fuerza general, dos veces por semana.', null),
-('80000000-0000-0000-0000-000000000002', 'Activación pre-partido', 'Rutina corta de activación para el día previo al partido.', null),
-('80000000-0000-0000-0000-000000000003', 'Rutina de grupos — Semanas 1 y 2 (Día MD-4)', 'Split por grupo físico, formato circuito.', null)
-on conflict (id) do update set name = excluded.name, notes = excluded.notes;
+insert into routines (id, name, notes, created_by, player_id, objective, plan_type, focus_area, intensity, start_date, duration_weeks, session_duration_minutes, status) values
+('80000000-0000-0000-0000-000000000001', 'Fuerza de piernas', 'Rutina de fuerza general, dos veces por semana.', null, null, null, null, null, null, null, null, null, 'Activa'),
+('80000000-0000-0000-0000-000000000002', 'Activación pre-partido', 'Rutina corta de activación para el día previo al partido.', null, null, null, null, null, null, null, null, null, 'Activa'),
+('80000000-0000-0000-0000-000000000003', 'Rutina de grupos — Semanas 1 y 2 (Día MD-4)', 'Split por grupo físico, formato circuito.', null, null, null, null, null, null, null, null, null, 'Activa'),
+('80000000-0000-0000-0000-000000000004', 'Fuerza de piernas post-esguince', null, null, '10000000-0000-0000-0000-00000000000a', 'Recuperar fuerza y estabilidad de tobillo tras esguince leve.', 'Rehabilitación', 'Tren inferior', 'Media', '2026-07-01', 4, 30, 'Activa')
+on conflict (id) do update set
+  name = excluded.name, notes = excluded.notes, player_id = excluded.player_id, objective = excluded.objective,
+  plan_type = excluded.plan_type, focus_area = excluded.focus_area, intensity = excluded.intensity,
+  start_date = excluded.start_date, duration_weeks = excluded.duration_weeks,
+  session_duration_minutes = excluded.session_duration_minutes, status = excluded.status;
 
 -- =========================================================
 -- routine_groups — prefijo 1d000000-0000-0000-0000-0000000000xx
@@ -189,12 +197,32 @@ insert into routine_exercises (id, routine_id, circuit_id, exercise_id, ad_hoc_n
 ('90000000-0000-0000-0000-00000000000d', '80000000-0000-0000-0000-000000000003', '1e000000-0000-0000-0000-000000000002', null, 'Aperturas planas', 2, 3, '8', null, null),
 ('90000000-0000-0000-0000-00000000000e', '80000000-0000-0000-0000-000000000003', '1e000000-0000-0000-0000-000000000003', null, 'Zancadas búlgaras', 0, 3, '6 por pierna', null, null),
 ('90000000-0000-0000-0000-00000000000f', '80000000-0000-0000-0000-000000000003', '1e000000-0000-0000-0000-000000000003', null, 'Press de banca', 1, 3, '12', null, null),
-('90000000-0000-0000-0000-000000000010', '80000000-0000-0000-0000-000000000003', '1e000000-0000-0000-0000-000000000003', null, 'Push up al step', 2, 3, '8', null, null)
+('90000000-0000-0000-0000-000000000010', '80000000-0000-0000-0000-000000000003', '1e000000-0000-0000-0000-000000000003', null, 'Push up al step', 2, 3, '8', null, null),
+-- Plan individual (Ignacio Torres) — uno de biblioteca + dos sueltos.
+('90000000-0000-0000-0000-000000000011', '80000000-0000-0000-0000-000000000004', null, '70000000-0000-0000-0000-000000000006', null, 0, 1, '10 min', null, null),
+('90000000-0000-0000-0000-000000000012', '80000000-0000-0000-0000-000000000004', null, null, 'Elevación de talones unipodal', 1, 3, '15', null, null),
+('90000000-0000-0000-0000-000000000013', '80000000-0000-0000-0000-000000000004', null, null, 'Sentadilla búlgara', 2, 3, '10', null, null)
 on conflict (id) do update set
   routine_id = excluded.routine_id, circuit_id = excluded.circuit_id, exercise_id = excluded.exercise_id,
   ad_hoc_name = excluded.ad_hoc_name, "order" = excluded."order",
   sets_override = excluded.sets_override, reps_override = excluded.reps_override,
   rest_seconds_override = excluded.rest_seconds_override, notes = excluded.notes;
+
+-- =========================================================
+-- routine_exercise_weeks (progresión del plan individual) — prefijo 17000000-0000-0000-0000-0000000000xx
+-- =========================================================
+insert into routine_exercise_weeks (id, routine_exercise_id, week_number, sets, reps) values
+('17000000-0000-0000-0000-000000000001', '90000000-0000-0000-0000-000000000012', 1, 3, '12'),
+('17000000-0000-0000-0000-000000000002', '90000000-0000-0000-0000-000000000012', 2, 3, '15'),
+('17000000-0000-0000-0000-000000000003', '90000000-0000-0000-0000-000000000012', 3, 4, '15'),
+('17000000-0000-0000-0000-000000000004', '90000000-0000-0000-0000-000000000012', 4, 4, '20'),
+('17000000-0000-0000-0000-000000000005', '90000000-0000-0000-0000-000000000013', 1, 2, '8'),
+('17000000-0000-0000-0000-000000000006', '90000000-0000-0000-0000-000000000013', 2, 3, '10'),
+('17000000-0000-0000-0000-000000000007', '90000000-0000-0000-0000-000000000013', 3, 3, '12'),
+('17000000-0000-0000-0000-000000000008', '90000000-0000-0000-0000-000000000013', 4, 4, '12')
+on conflict (id) do update set
+  routine_exercise_id = excluded.routine_exercise_id, week_number = excluded.week_number,
+  sets = excluded.sets, reps = excluded.reps;
 
 -- =========================================================
 -- routine_assignments — prefijo a0000000-0000-0000-0000-0000000000xx
@@ -370,46 +398,6 @@ insert into becados (id, first_name, last_name, dni, type, status, notes) values
 on conflict (id) do update set
   first_name = excluded.first_name, last_name = excluded.last_name, dni = excluded.dni,
   type = excluded.type, status = excluded.status, notes = excluded.notes;
-
--- =========================================================
--- individual_plans (plan de Ignacio Torres) — prefijo 15000000-0000-0000-0000-0000000000xx
--- Requiere haber corrido 0013_individual_plans.sql.
--- =========================================================
-insert into individual_plans (id, player_id, name, objective, description, type, focus_area, start_date, duration_weeks, session_duration_minutes, intensity, status, notes, created_by) values
-('15000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-00000000000a', 'Fuerza de piernas post-esguince', 'Recuperar fuerza y estabilidad de tobillo tras esguince leve.', null, 'Rehabilitación', 'Tren inferior', '2026-07-01', 4, 30, 'Media', 'Activa', null, null)
-on conflict (id) do update set
-  player_id = excluded.player_id, name = excluded.name, objective = excluded.objective,
-  description = excluded.description, type = excluded.type, focus_area = excluded.focus_area,
-  start_date = excluded.start_date, duration_weeks = excluded.duration_weeks,
-  session_duration_minutes = excluded.session_duration_minutes, intensity = excluded.intensity,
-  status = excluded.status, notes = excluded.notes;
-
--- =========================================================
--- individual_plan_exercises — prefijo 16000000-0000-0000-0000-0000000000xx
--- =========================================================
-insert into individual_plan_exercises (id, plan_id, exercise_id, ad_hoc_name, "order", base_sets, base_reps, notes) values
-('16000000-0000-0000-0000-000000000001', '15000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-00000000000d', null, 1, 1, '10 min', null),
-('16000000-0000-0000-0000-000000000002', '15000000-0000-0000-0000-000000000001', null, 'Elevación de talones unipodal', 2, 3, '15', null),
-('16000000-0000-0000-0000-000000000003', '15000000-0000-0000-0000-000000000001', null, 'Sentadilla búlgara', 3, 3, '10', null)
-on conflict (id) do update set
-  plan_id = excluded.plan_id, exercise_id = excluded.exercise_id, ad_hoc_name = excluded.ad_hoc_name,
-  "order" = excluded."order", base_sets = excluded.base_sets, base_reps = excluded.base_reps;
-
--- =========================================================
--- individual_plan_exercise_weeks (progresión) — prefijo 17000000-0000-0000-0000-0000000000xx
--- =========================================================
-insert into individual_plan_exercise_weeks (id, plan_exercise_id, week_number, sets, reps) values
-('17000000-0000-0000-0000-000000000001', '16000000-0000-0000-0000-000000000002', 1, 3, '12'),
-('17000000-0000-0000-0000-000000000002', '16000000-0000-0000-0000-000000000002', 2, 3, '15'),
-('17000000-0000-0000-0000-000000000003', '16000000-0000-0000-0000-000000000002', 3, 4, '15'),
-('17000000-0000-0000-0000-000000000004', '16000000-0000-0000-0000-000000000002', 4, 4, '20'),
-('17000000-0000-0000-0000-000000000005', '16000000-0000-0000-0000-000000000003', 1, 2, '8'),
-('17000000-0000-0000-0000-000000000006', '16000000-0000-0000-0000-000000000003', 2, 3, '10'),
-('17000000-0000-0000-0000-000000000007', '16000000-0000-0000-0000-000000000003', 3, 3, '12'),
-('17000000-0000-0000-0000-000000000008', '16000000-0000-0000-0000-000000000003', 4, 4, '12')
-on conflict (id) do update set
-  plan_exercise_id = excluded.plan_exercise_id, week_number = excluded.week_number,
-  sets = excluded.sets, reps = excluded.reps;
 
 -- =========================================================
 -- player_report_notes — prefijo 18000000-0000-0000-0000-0000000000xx

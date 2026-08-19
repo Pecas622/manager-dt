@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom"
 import { RootShell } from "@/components/layout/RootShell"
 import { ProtectedRoute } from "@/auth/ProtectedRoute"
 import { LoginPage } from "@/pages/LoginPage"
+import { AcceptInvitePage } from "@/pages/AcceptInvitePage"
 import { DashboardPage } from "@/pages/DashboardPage"
 import { PlayersPage } from "@/pages/PlayersPage"
 import { PlayerFormPage } from "@/pages/PlayerFormPage"
@@ -30,10 +31,10 @@ import { SecurityCheckPage } from "@/pages/SecurityCheckPage"
 import { BecadosPage } from "@/pages/BecadosPage"
 import { IndividualPlansPage } from "@/pages/IndividualPlansPage"
 import { IndividualPlanFormPage } from "@/pages/IndividualPlanFormPage"
-import { IndividualPlanDetailPage } from "@/pages/IndividualPlanDetailPage"
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
+  { path: "/aceptar-invitacion", element: <AcceptInvitePage /> },
   { path: "/seguridad", element: <SecurityCheckPage /> },
   {
     element: (
@@ -79,7 +80,7 @@ export const router = createBrowserRouter([
       { path: "/routines/:id", element: <RoutineDetailPage /> },
       { path: "/planes", element: <IndividualPlansPage /> },
       { path: "/planes/new", element: <IndividualPlanFormPage /> },
-      { path: "/planes/:id", element: <IndividualPlanDetailPage /> },
+      { path: "/planes/:id", element: <RoutineDetailPage /> },
       { path: "/planes/:id/edit", element: <IndividualPlanFormPage /> },
       {
         path: "/evaluations",

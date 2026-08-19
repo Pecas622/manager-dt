@@ -20,6 +20,8 @@ import type {
 const PHYSICAL_EXERCISES_KEY = ["physical_exercises"] as const
 const ROUTINES_KEY = ["routines"] as const
 const ROUTINE_ASSIGNMENTS_KEY = ["routine_assignments"] as const
+// Sub-key de ROUTINES_KEY (prefijo) — invalidar ["routines"] invalida esto también.
+const PLANS_KEY = [...ROUTINES_KEY, "plans"] as const
 
 // ---------- Ejercicios físicos ----------
 
@@ -105,6 +107,7 @@ export function useRoutines() {
       const { data, error } = await supabase
         .from("routines")
         .select("*, routine_exercises(id)")
+        .is("player_id", null)
         .order("name", { ascending: true })
       if (error) throw error
       return data as (Routine & { routine_exercises: { id: string }[] })[]
@@ -124,7 +127,7 @@ export function useRoutine(id: string | undefined) {
       const { data, error } = await supabase
         .from("routines")
         .select(
-          "*, routine_exercises(*, exercise:physical_exercises(*)), routine_groups(*, routine_circuits(*))"
+          "*, routine_exercises(*, exercise:physical_exercises(*), weeks:routine_exercise_weeks(*)), routine_groups(*, routine_circuits(*))"
         )
         .eq("id", id)
         .order("order", { referencedTable: "routine_exercises", ascending: true })
@@ -138,6 +141,142 @@ export function useRoutine(id: string | undefined) {
       return data as RoutineDetail
     },
     enabled: Boolean(id),
+  })
+}
+
+// ---------- Planes individuales (rutinas con player_id) ----------
+
+export function usePlans() {
+  return useQuery({
+    queryKey: PLANS_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("routines")
+        .select("*, player:players(*), routine_exercises(id)")
+        .not("player_id", "is", null)
+        .order("created_at", { ascending: false })
+      if (error) throw error
+      return data as (Routine & { routine_exercises: { id: string }[] })[]
+    },
+  })
+}
+
+export function usePlayerPlans(playerId: string | undefined) {
+  return useQuery({
+    queryKey: [...PLANS_KEY, "player", playerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("routines")
+        .select("*")
+        .eq("player_id", playerId)
+        .order("status", { ascending: true })
+        .order("created_at", { ascending: false })
+      if (error) throw error
+      return data as Routine[]
+    },
+    enabled: Boolean(playerId),
+  })
+}
+
+// Clona un plan completo (datos + ejercicios planos + progresión semanal)
+// como uno nuevo, activo, con "(copia)" en el nombre.
+export function useDuplicatePlan() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data: original, error: fetchError } = await supabase
+        .from("routines")
+        .select("*, routine_exercises(*, weeks:routine_exercise_weeks(*))")
+        .eq("id", id)
+        .single()
+      if (fetchError) throw fetchError
+      const source = original as RoutineDetail
+
+      const { data: newPlan, error: createError } = await supabase
+        .from("routines")
+        .insert({
+          player_id: source.player_id,
+          name: `${source.name} (copia)`,
+          notes: source.notes,
+          objective: source.objective,
+          plan_type: source.plan_type,
+          focus_area: source.focus_area,
+          intensity: source.intensity,
+          start_date: source.start_date,
+          duration_weeks: source.duration_weeks,
+          session_duration_minutes: source.session_duration_minutes,
+          status: "Activa",
+          created_by: source.created_by,
+        })
+        .select()
+        .single()
+      if (createError) throw createError
+
+      const flatExercises = source.routine_exercises.filter((e) => !e.circuit_id)
+      for (const exercise of flatExercises) {
+        const { data: newExercise, error: exError } = await supabase
+          .from("routine_exercises")
+          .insert({
+            routine_id: newPlan.id,
+            circuit_id: null,
+            exercise_id: exercise.exercise_id,
+            ad_hoc_name: exercise.ad_hoc_name,
+            order: exercise.order,
+            sets_override: exercise.sets_override,
+            reps_override: exercise.reps_override,
+            rest_seconds_override: exercise.rest_seconds_override,
+            notes: exercise.notes,
+          })
+          .select()
+          .single()
+        if (exError) throw exError
+
+        const weeks = exercise.weeks ?? []
+        if (weeks.length > 0) {
+          const { error: weeksError } = await supabase.from("routine_exercise_weeks").insert(
+            weeks.map((w) => ({
+              routine_exercise_id: newExercise.id,
+              week_number: w.week_number,
+              sets: w.sets,
+              reps: w.reps,
+            }))
+          )
+          if (weeksError) throw weeksError
+        }
+      }
+
+      return newPlan as Routine
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ROUTINES_KEY })
+    },
+  })
+}
+
+export function useSetRoutineExerciseWeek() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      routineId,
+      routineExerciseId,
+      weekNumber,
+      sets,
+      reps,
+    }: {
+      routineId: string
+      routineExerciseId: string
+      weekNumber: number
+      sets: number | null
+      reps: string | null
+    }) => {
+      const { error } = await supabase.from("routine_exercise_weeks").upsert(
+        { routine_exercise_id: routineExerciseId, week_number: weekNumber, sets, reps },
+        { onConflict: "routine_exercise_id,week_number" }
+      )
+      if (error) throw error
+      return routineId
+    },
+    onSuccess: (routineId) => invalidateRoutine(queryClient, routineId),
   })
 }
 

@@ -16,11 +16,11 @@ import { CSS } from "@dnd-kit/utilities"
 import { GripVertical, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
-  useRemovePlanExercise,
-  useReorderPlanExercises,
-  useSetPlanExerciseWeek,
-} from "@/hooks/useIndividualPlans"
-import type { IndividualPlanExercise } from "@/types/database"
+  useRemoveRoutineExercise,
+  useReorderRoutineExercises,
+  useSetRoutineExerciseWeek,
+} from "@/hooks/useRoutines"
+import type { RoutineExercise } from "@/types/database"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -28,18 +28,18 @@ import { Button } from "@/components/ui/button"
 function ExerciseRow({
   item,
   index,
-  planId,
+  routineId,
   week,
 }: {
-  item: IndividualPlanExercise
+  item: RoutineExercise
   index: number
-  planId: string
+  routineId: string
   week: number
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: item.id })
-  const removeExercise = useRemovePlanExercise()
-  const setWeek = useSetPlanExerciseWeek()
+  const removeExercise = useRemoveRoutineExercise()
+  const setWeek = useSetRoutineExerciseWeek()
 
   const weekData = item.weeks?.find((w) => w.week_number === week)
   const [sets, setSets] = useState(weekData?.sets?.toString() ?? "")
@@ -50,8 +50,8 @@ function ExerciseRow({
 
   function commit() {
     setWeek.mutate({
-      planId,
-      planExerciseId: item.id,
+      routineId,
+      routineExerciseId: item.id,
       weekNumber: week,
       sets: sets ? Number(sets) : null,
       reps: reps || null,
@@ -61,7 +61,7 @@ function ExerciseRow({
   async function handleRemove() {
     if (!confirm(`¿Quitar "${name}" del plan?`)) return
     try {
-      await removeExercise.mutateAsync({ id: item.id, planId })
+      await removeExercise.mutateAsync({ id: item.id, routineId })
     } catch {
       toast.error("No se pudo quitar el ejercicio")
     }
@@ -84,9 +84,9 @@ function ExerciseRow({
             <p className="text-sm font-medium">
               {index + 1}. {name}
             </p>
-            {(item.base_sets || item.base_reps) && (
+            {(item.sets_override || item.reps_override) && (
               <p className="text-xs text-muted-foreground">
-                Base: {item.base_sets ?? "-"}×{item.base_reps ?? "-"}
+                Base: {item.sets_override ?? "-"}×{item.reps_override ?? "-"}
               </p>
             )}
           </div>
@@ -124,16 +124,16 @@ function ExerciseRow({
   )
 }
 
-export function PlanExerciseList({
-  planId,
+export function RoutinePlanExerciseList({
+  routineId,
   items,
   week,
 }: {
-  planId: string
-  items: IndividualPlanExercise[]
+  routineId: string
+  items: RoutineExercise[]
   week: number
 }) {
-  const reorder = useReorderPlanExercises()
+  const reorder = useReorderRoutineExercises()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
@@ -147,7 +147,7 @@ export function PlanExerciseList({
     const reordered = [...items]
     const [moved] = reordered.splice(oldIndex, 1)
     reordered.splice(newIndex, 0, moved)
-    reorder.mutate({ planId, orderedIds: reordered.map((i) => i.id) })
+    reorder.mutate({ routineId, orderedIds: reordered.map((i) => i.id) })
   }
 
   if (items.length === 0) {
@@ -167,7 +167,7 @@ export function PlanExerciseList({
               key={`${item.id}-${week}`}
               item={item}
               index={index}
-              planId={planId}
+              routineId={routineId}
               week={week}
             />
           ))}

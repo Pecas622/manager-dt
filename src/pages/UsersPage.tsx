@@ -1,13 +1,15 @@
 import { useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { ArrowLeft, Database, Plus, Trash2, UserPlus } from "lucide-react"
+import { ArrowLeft, Database, Mail, Plus, Trash2, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
 import { useCreateProfile, useDeleteProfile, useProfiles } from "@/hooks/useProfiles"
 import { usePlayers } from "@/hooks/usePlayers"
 import { useCleanupDemoData, useSeedDemoData } from "@/hooks/useDemoData"
+import { supabase } from "@/lib/supabaseClient"
 import { USER_ROLES, USER_ROLE_LABELS, type UserRole } from "@/types/domain"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -38,8 +40,18 @@ const linkSchema = z.object({
 
 type LinkFormValues = z.infer<typeof linkSchema>
 
+const inviteSchema = z.object({
+  email: z.string().email("Tiene que ser un email válido"),
+  full_name: z.string().optional(),
+  role: z.enum(USER_ROLES, { message: "Seleccioná un rol" }),
+  player_id: z.string().optional(),
+})
+
+type InviteFormValues = z.infer<typeof inviteSchema>
+
 export function UsersPage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { data: profiles, isLoading } = useProfiles()
   const { data: players } = usePlayers()
   const createProfile = useCreateProfile()
@@ -47,6 +59,8 @@ export function UsersPage() {
   const seedDemoData = useSeedDemoData()
   const cleanupDemoData = useCleanupDemoData()
   const [open, setOpen] = useState(false)
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [inviting, setInviting] = useState(false)
 
   const {
     register,
@@ -62,6 +76,20 @@ export function UsersPage() {
 
   const role = watch("role")
 
+  const {
+    register: registerInvite,
+    handleSubmit: handleSubmitInvite,
+    watch: watchInvite,
+    setValue: setInviteValue,
+    reset: resetInvite,
+    formState: { errors: inviteErrors },
+  } = useForm<InviteFormValues>({
+    resolver: zodResolver(inviteSchema),
+    defaultValues: { email: "", full_name: "", role: "jugador", player_id: "" },
+  })
+
+  const inviteRole = watchInvite("role")
+
   async function onSubmit(values: LinkFormValues) {
     try {
       await createProfile.mutateAsync({
@@ -75,6 +103,42 @@ export function UsersPage() {
       setOpen(false)
     } catch {
       toast.error("No se pudo vincular. Verificá que el UUID exista en Authentication → Users.")
+    }
+  }
+
+  async function onSubmitInvite(values: InviteFormValues) {
+    setInviting(true)
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      const res = await fetch("/api/invite-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? ""}`,
+        },
+        body: JSON.stringify({
+          email: values.email,
+          full_name: values.full_name || null,
+          role: values.role,
+          playerId: values.role === "jugador" ? values.player_id || null : null,
+        }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.error ?? "No se pudo invitar")
+      }
+      toast.success("Invitación enviada")
+      resetInvite({ email: "", full_name: "", role: "jugador", player_id: "" })
+      setInviteOpen(false)
+      // La función invite-user inserta el profile directo por service role,
+      // sin pasar por useCreateProfile — hay que invalidar a mano.
+      queryClient.invalidateQueries({ queryKey: ["profiles"] })
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo invitar")
+    } finally {
+      setInviting(false)
     }
   }
 
@@ -122,17 +186,25 @@ export function UsersPage() {
           </Button>
           <h1 className="text-xl font-semibold">Usuarios</h1>
         </div>
-        <Button onClick={() => setOpen(true)} className="h-10">
-          <UserPlus /> Vincular cuenta
-        </Button>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="outline" onClick={() => setOpen(true)} className="h-10">
+            <UserPlus /> Vincular por UUID
+          </Button>
+          <Button onClick={() => setInviteOpen(true)} className="h-10">
+            <Mail /> Invitar por email
+          </Button>
+        </div>
       </div>
 
       <Card>
         <CardContent className="text-sm text-muted-foreground">
-          Para dar acceso a un Profesor o Jugador, primero creá su usuario en el
-          dashboard de Supabase (Authentication → Users → Add user) con su email
-          y una contraseña provisoria. Copiá el UUID que te muestra ahí y
-          vinculalo acá con su rol.
+          <strong className="text-foreground">Invitar por email</strong> es la
+          forma normal de dar acceso a un Profesor o Jugador: cargás su email y
+          rol, le llega un mail para que ponga su propia contraseña, y queda
+          vinculado solo. <strong className="text-foreground">Vincular por UUID</strong>{" "}
+          es el flujo manual — creás vos el usuario en el dashboard de Supabase
+          (Authentication → Users → Add user) y pegás acá el UUID que te
+          muestra; usalo solo si necesitás vincular una cuenta que ya existe.
         </CardContent>
       </Card>
 
@@ -265,6 +337,79 @@ export function UsersPage() {
             <DialogFooter>
               <Button type="submit" disabled={isSubmitting} className="h-11">
                 <Plus /> Vincular
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invitar por email</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmitInvite(onSubmitInvite)} className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="invite-email">Email</Label>
+              <Input
+                id="invite-email"
+                type="email"
+                className="h-11"
+                {...registerInvite("email")}
+              />
+              {inviteErrors.email && (
+                <p className="text-xs text-destructive">{inviteErrors.email.message}</p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="invite-full_name">Nombre</Label>
+              <Input id="invite-full_name" className="h-11" {...registerInvite("full_name")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>Rol</Label>
+              <Select
+                value={inviteRole}
+                onValueChange={(v) => v && setInviteValue("role", v as UserRole)}
+              >
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {USER_ROLES.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {USER_ROLE_LABELS[r]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {inviteRole === "jugador" && (
+              <div className="flex flex-col gap-1.5">
+                <Label>Jugador</Label>
+                <Select
+                  value={watchInvite("player_id") || undefined}
+                  onValueChange={(v) => setInviteValue("player_id", v ?? "")}
+                >
+                  <SelectTrigger className="h-11 w-full">
+                    <SelectValue placeholder="Seleccionar jugador" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {players?.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.first_name} {p.last_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button type="submit" disabled={inviting} className="h-11">
+                <Mail /> {inviting ? "Enviando..." : "Invitar"}
               </Button>
             </DialogFooter>
           </form>

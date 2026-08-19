@@ -10,7 +10,7 @@ import { usePlayerTotalMinutes } from "@/hooks/useMatchSubstitutions"
 import { usePlayerCardCounts } from "@/hooks/useMatchCards"
 import { usePlayerGoalCount } from "@/hooks/useMatchGoals"
 import { usePlayerPhysicalTests } from "@/hooks/usePhysicalTests"
-import { usePlayerIndividualPlans } from "@/hooks/useIndividualPlans"
+import { usePlayerPlans } from "@/hooks/useRoutines"
 import { useAddPlayerReportNote, usePlayerReportNotes } from "@/hooks/usePlayerReportNotes"
 import { useAuth } from "@/hooks/useAuth"
 import { Badge } from "@/components/ui/badge"
@@ -29,7 +29,7 @@ export function PlayerReportPage() {
   const { data: cardCounts } = usePlayerCardCounts(id)
   const { data: goalCount } = usePlayerGoalCount(id)
   const { data: physicalTests } = usePlayerPhysicalTests(id)
-  const { data: plans } = usePlayerIndividualPlans(id)
+  const { data: plans } = usePlayerPlans(id)
   const { data: notes } = usePlayerReportNotes(id)
   const addNote = useAddPlayerReportNote()
   const [draft, setDraft] = useState("")
@@ -197,8 +197,8 @@ export function PlayerReportPage() {
               {activePlans.map((plan) => (
                 <div key={plan.id} className="flex flex-wrap items-center gap-2">
                   <p className="text-sm font-medium">{plan.name}</p>
-                  <Badge variant="outline">{plan.type}</Badge>
-                  <Badge variant="outline">{plan.focus_area}</Badge>
+                  {plan.plan_type && <Badge variant="outline">{plan.plan_type}</Badge>}
+                  {plan.focus_area && <Badge variant="outline">{plan.focus_area}</Badge>}
                 </div>
               ))}
             </div>

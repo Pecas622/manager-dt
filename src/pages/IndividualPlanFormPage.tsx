@@ -5,11 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import {
-  useCreateIndividualPlan,
-  useIndividualPlan,
-  useUpdateIndividualPlan,
-} from "@/hooks/useIndividualPlans"
+import { useCreateRoutine, useRoutine, useUpdateRoutine } from "@/hooks/useRoutines"
 import { usePlayers } from "@/hooks/usePlayers"
 import { useAuth } from "@/hooks/useAuth"
 import {
@@ -64,9 +60,9 @@ export function IndividualPlanFormPage() {
   const navigate = useNavigate()
   const { session } = useAuth()
   const { data: players } = usePlayers()
-  const { data: plan, isLoading } = useIndividualPlan(id)
-  const createPlan = useCreateIndividualPlan()
-  const updatePlan = useUpdateIndividualPlan()
+  const { data: plan, isLoading } = useRoutine(id)
+  const createPlan = useCreateRoutine()
+  const updatePlan = useUpdateRoutine()
 
   const {
     register,
@@ -81,16 +77,16 @@ export function IndividualPlanFormPage() {
   })
 
   useEffect(() => {
-    if (plan) {
+    if (plan && plan.plan_type && plan.focus_area && plan.intensity && plan.start_date) {
       reset({
-        player_id: plan.player_id,
+        player_id: plan.player_id ?? "",
         name: plan.name,
         objective: plan.objective ?? "",
-        description: plan.description ?? "",
-        type: plan.type,
+        description: plan.notes ?? "",
+        type: plan.plan_type,
         focus_area: plan.focus_area,
         start_date: plan.start_date,
-        duration_weeks: plan.duration_weeks.toString(),
+        duration_weeks: (plan.duration_weeks ?? 4).toString(),
         session_duration_minutes: plan.session_duration_minutes?.toString() ?? "",
         intensity: plan.intensity,
       })
@@ -102,8 +98,8 @@ export function IndividualPlanFormPage() {
       player_id: values.player_id,
       name: values.name,
       objective: values.objective || null,
-      description: values.description || null,
-      type: values.type,
+      notes: values.description || null,
+      plan_type: values.type,
       focus_area: values.focus_area,
       start_date: values.start_date,
       duration_weeks: Number(values.duration_weeks),
@@ -112,7 +108,6 @@ export function IndividualPlanFormPage() {
         : null,
       intensity: values.intensity,
       status: (plan?.status ?? "Activa") as "Activa" | "Archivada",
-      notes: plan?.notes ?? null,
       created_by: plan?.created_by ?? session?.user.id ?? null,
     }
 

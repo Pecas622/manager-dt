@@ -3,14 +3,14 @@ import { Link } from "react-router-dom"
 import { CalendarRange, User } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import type { IndividualPlan } from "@/types/database"
+import type { Routine } from "@/types/database"
 
-export function IndividualPlanCard({
+export function PlanCard({
   plan,
   exerciseCount,
   action,
 }: {
-  plan: IndividualPlan
+  plan: Routine
   exerciseCount?: number
   action?: ReactNode
 }) {
@@ -20,8 +20,8 @@ export function IndividualPlanCard({
         <Link to={`/planes/${plan.id}`} className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-medium">{plan.name}</p>
-            <Badge variant="outline">{plan.type}</Badge>
-            <Badge variant="outline">{plan.focus_area}</Badge>
+            {plan.plan_type && <Badge variant="outline">{plan.plan_type}</Badge>}
+            {plan.focus_area && <Badge variant="outline">{plan.focus_area}</Badge>}
             {plan.status === "Archivada" && <Badge variant="secondary">Archivada</Badge>}
           </div>
           {plan.objective && (
@@ -34,13 +34,13 @@ export function IndividualPlanCard({
                 {plan.player.first_name} {plan.player.last_name}
               </span>
             )}
-            <span className="flex items-center gap-1">
-              <CalendarRange className="size-3.5" />
-              {plan.duration_weeks} semana{plan.duration_weeks === 1 ? "" : "s"}
-            </span>
-            {typeof exerciseCount === "number" && (
-              <span>{exerciseCount} ejercicios</span>
+            {plan.duration_weeks != null && (
+              <span className="flex items-center gap-1">
+                <CalendarRange className="size-3.5" />
+                {plan.duration_weeks} semana{plan.duration_weeks === 1 ? "" : "s"}
+              </span>
             )}
+            {typeof exerciseCount === "number" && <span>{exerciseCount} ejercicios</span>}
           </div>
         </Link>
         {action}

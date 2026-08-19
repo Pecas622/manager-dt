@@ -2,9 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
 import {
   DEMO_ID_RANGES,
-  DEMO_INDIVIDUAL_PLANS,
-  DEMO_INDIVIDUAL_PLAN_EXERCISES,
-  DEMO_INDIVIDUAL_PLAN_EXERCISE_WEEKS,
   DEMO_MATCHES,
   DEMO_MATCH_CARDS,
   DEMO_MATCH_GOALS,
@@ -24,6 +21,7 @@ import {
   DEMO_ROUTINE_ASSIGNMENTS,
   DEMO_ROUTINE_CIRCUITS,
   DEMO_ROUTINE_EXERCISES,
+  DEMO_ROUTINE_EXERCISE_WEEKS,
   DEMO_ROUTINE_GROUPS,
   DEMO_SESSION_EXERCISES,
   DEMO_TRAINING_EXERCISES,
@@ -45,6 +43,7 @@ const SEED_STEPS: [table: string, rows: Record<string, unknown>[]][] = [
   ["routine_groups", DEMO_ROUTINE_GROUPS],
   ["routine_circuits", DEMO_ROUTINE_CIRCUITS],
   ["routine_exercises", DEMO_ROUTINE_EXERCISES],
+  ["routine_exercise_weeks", DEMO_ROUTINE_EXERCISE_WEEKS],
   ["routine_assignments", DEMO_ROUTINE_ASSIGNMENTS],
   ["nationals", DEMO_NATIONALS],
   ["tournaments", DEMO_TOURNAMENTS],
@@ -58,9 +57,6 @@ const SEED_STEPS: [table: string, rows: Record<string, unknown>[]][] = [
   ["national_player_costs", DEMO_NATIONAL_PLAYER_COSTS],
   ["national_payments", DEMO_NATIONAL_PAYMENTS],
   ["physical_tests", DEMO_PHYSICAL_TESTS],
-  ["individual_plans", DEMO_INDIVIDUAL_PLANS],
-  ["individual_plan_exercises", DEMO_INDIVIDUAL_PLAN_EXERCISES],
-  ["individual_plan_exercise_weeks", DEMO_INDIVIDUAL_PLAN_EXERCISE_WEEKS],
   ["player_report_notes", DEMO_PLAYER_REPORT_NOTES],
 ]
 

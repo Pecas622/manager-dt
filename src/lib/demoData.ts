@@ -99,10 +99,14 @@ export const DEMO_PHYSICAL_EXERCISES = [
   { id: "70000000-0000-0000-0000-000000000006", name: "Movilidad de cadera", sets: 2, reps: "10", rest_seconds: 30, video_url: null, image_url: null, instructions: "Círculos amplios de cadera, ambos sentidos." },
 ]
 
+// La última (id ...004) es un Plan Individual: una rutina con player_id
+// seteado — privada de Ignacio Torres, con metadata de plan y progresión
+// semanal en sus ejercicios (ver DEMO_ROUTINE_EXERCISE_WEEKS).
 export const DEMO_ROUTINES = [
-  { id: "80000000-0000-0000-0000-000000000001", name: "Fuerza de piernas", notes: "Rutina de fuerza general, dos veces por semana.", created_by: null },
-  { id: "80000000-0000-0000-0000-000000000002", name: "Activación pre-partido", notes: "Rutina corta de activación para el día previo al partido.", created_by: null },
-  { id: "80000000-0000-0000-0000-000000000003", name: "Rutina de grupos — Semanas 1 y 2 (Día MD-4)", notes: "Split por grupo físico, formato circuito.", created_by: null },
+  { id: "80000000-0000-0000-0000-000000000001", name: "Fuerza de piernas", notes: "Rutina de fuerza general, dos veces por semana.", created_by: null, player_id: null, objective: null, plan_type: null, focus_area: null, intensity: null, start_date: null, duration_weeks: null, session_duration_minutes: null, status: "Activa" },
+  { id: "80000000-0000-0000-0000-000000000002", name: "Activación pre-partido", notes: "Rutina corta de activación para el día previo al partido.", created_by: null, player_id: null, objective: null, plan_type: null, focus_area: null, intensity: null, start_date: null, duration_weeks: null, session_duration_minutes: null, status: "Activa" },
+  { id: "80000000-0000-0000-0000-000000000003", name: "Rutina de grupos — Semanas 1 y 2 (Día MD-4)", notes: "Split por grupo físico, formato circuito.", created_by: null, player_id: null, objective: null, plan_type: null, focus_area: null, intensity: null, start_date: null, duration_weeks: null, session_duration_minutes: null, status: "Activa" },
+  { id: "80000000-0000-0000-0000-000000000004", name: "Fuerza de piernas post-esguince", notes: null, created_by: null, player_id: "10000000-0000-0000-0000-00000000000a", objective: "Recuperar fuerza y estabilidad de tobillo tras esguince leve.", plan_type: "Rehabilitación", focus_area: "Tren inferior", intensity: "Media", start_date: "2026-07-01", duration_weeks: 4, session_duration_minutes: 30, status: "Activa" },
 ]
 
 // Grupos y circuitos de la rutina "de grupos" — muestra el formato de
@@ -139,6 +143,23 @@ export const DEMO_ROUTINE_EXERCISES = [
   { id: "90000000-0000-0000-0000-00000000000e", routine_id: "80000000-0000-0000-0000-000000000003", circuit_id: "1e000000-0000-0000-0000-000000000003", exercise_id: null, ad_hoc_name: "Zancadas búlgaras", order: 0, sets_override: 3, reps_override: "6 por pierna", rest_seconds_override: null, notes: null },
   { id: "90000000-0000-0000-0000-00000000000f", routine_id: "80000000-0000-0000-0000-000000000003", circuit_id: "1e000000-0000-0000-0000-000000000003", exercise_id: null, ad_hoc_name: "Press de banca", order: 1, sets_override: 3, reps_override: "12", rest_seconds_override: null, notes: null },
   { id: "90000000-0000-0000-0000-000000000010", routine_id: "80000000-0000-0000-0000-000000000003", circuit_id: "1e000000-0000-0000-0000-000000000003", exercise_id: null, ad_hoc_name: "Push up al step", order: 2, sets_override: 3, reps_override: "8", rest_seconds_override: null, notes: null },
+  // Plan individual (Ignacio Torres) — un ejercicio de la biblioteca física
+  // + dos sueltos, con progresión de series/reps semana a semana (ver
+  // DEMO_ROUTINE_EXERCISE_WEEKS) en los dos sueltos.
+  { id: "90000000-0000-0000-0000-000000000011", routine_id: "80000000-0000-0000-0000-000000000004", circuit_id: null, exercise_id: "70000000-0000-0000-0000-000000000006", ad_hoc_name: null, order: 0, sets_override: 1, reps_override: "10 min", rest_seconds_override: null, notes: null },
+  { id: "90000000-0000-0000-0000-000000000012", routine_id: "80000000-0000-0000-0000-000000000004", circuit_id: null, exercise_id: null, ad_hoc_name: "Elevación de talones unipodal", order: 1, sets_override: 3, reps_override: "15", rest_seconds_override: null, notes: null },
+  { id: "90000000-0000-0000-0000-000000000013", routine_id: "80000000-0000-0000-0000-000000000004", circuit_id: null, exercise_id: null, ad_hoc_name: "Sentadilla búlgara", order: 2, sets_override: 3, reps_override: "10", rest_seconds_override: null, notes: null },
+]
+
+export const DEMO_ROUTINE_EXERCISE_WEEKS = [
+  { id: "17000000-0000-0000-0000-000000000001", routine_exercise_id: "90000000-0000-0000-0000-000000000012", week_number: 1, sets: 3, reps: "12" },
+  { id: "17000000-0000-0000-0000-000000000002", routine_exercise_id: "90000000-0000-0000-0000-000000000012", week_number: 2, sets: 3, reps: "15" },
+  { id: "17000000-0000-0000-0000-000000000003", routine_exercise_id: "90000000-0000-0000-0000-000000000012", week_number: 3, sets: 4, reps: "15" },
+  { id: "17000000-0000-0000-0000-000000000004", routine_exercise_id: "90000000-0000-0000-0000-000000000012", week_number: 4, sets: 4, reps: "20" },
+  { id: "17000000-0000-0000-0000-000000000005", routine_exercise_id: "90000000-0000-0000-0000-000000000013", week_number: 1, sets: 2, reps: "8" },
+  { id: "17000000-0000-0000-0000-000000000006", routine_exercise_id: "90000000-0000-0000-0000-000000000013", week_number: 2, sets: 3, reps: "10" },
+  { id: "17000000-0000-0000-0000-000000000007", routine_exercise_id: "90000000-0000-0000-0000-000000000013", week_number: 3, sets: 3, reps: "12" },
+  { id: "17000000-0000-0000-0000-000000000008", routine_exercise_id: "90000000-0000-0000-0000-000000000013", week_number: 4, sets: 4, reps: "12" },
 ]
 
 export const DEMO_ROUTINE_ASSIGNMENTS = [
@@ -262,45 +283,6 @@ export const DEMO_BECADOS = [
   { id: "14000000-0000-0000-0000-000000000005", first_name: "Agustina", last_name: "Ríos", dni: "43444555", type: "Cuota", status: "Inactivo", notes: "Atrasada dos meses." },
 ]
 
-// Plan individual de ejemplo (Ignacio Torres, vuelta de un esguince de
-// tobillo) — un ejercicio de la biblioteca táctica + dos sueltos, con
-// progresión de series/reps semana a semana en los sueltos.
-export const DEMO_INDIVIDUAL_PLANS = [
-  {
-    id: "15000000-0000-0000-0000-000000000001",
-    player_id: "10000000-0000-0000-0000-00000000000a",
-    name: "Fuerza de piernas post-esguince",
-    objective: "Recuperar fuerza y estabilidad de tobillo tras esguince leve.",
-    description: null,
-    type: "Rehabilitación",
-    focus_area: "Tren inferior",
-    start_date: "2026-07-01",
-    duration_weeks: 4,
-    session_duration_minutes: 30,
-    intensity: "Media",
-    status: "Activa",
-    notes: null,
-    created_by: null,
-  },
-]
-
-export const DEMO_INDIVIDUAL_PLAN_EXERCISES = [
-  { id: "16000000-0000-0000-0000-000000000001", plan_id: "15000000-0000-0000-0000-000000000001", exercise_id: "20000000-0000-0000-0000-00000000000d", ad_hoc_name: null, order: 1, base_sets: 1, base_reps: "10 min", notes: null },
-  { id: "16000000-0000-0000-0000-000000000002", plan_id: "15000000-0000-0000-0000-000000000001", exercise_id: null, ad_hoc_name: "Elevación de talones unipodal", order: 2, base_sets: 3, base_reps: "15", notes: null },
-  { id: "16000000-0000-0000-0000-000000000003", plan_id: "15000000-0000-0000-0000-000000000001", exercise_id: null, ad_hoc_name: "Sentadilla búlgara", order: 3, base_sets: 3, base_reps: "10", notes: null },
-]
-
-export const DEMO_INDIVIDUAL_PLAN_EXERCISE_WEEKS = [
-  { id: "17000000-0000-0000-0000-000000000001", plan_exercise_id: "16000000-0000-0000-0000-000000000002", week_number: 1, sets: 3, reps: "12" },
-  { id: "17000000-0000-0000-0000-000000000002", plan_exercise_id: "16000000-0000-0000-0000-000000000002", week_number: 2, sets: 3, reps: "15" },
-  { id: "17000000-0000-0000-0000-000000000003", plan_exercise_id: "16000000-0000-0000-0000-000000000002", week_number: 3, sets: 4, reps: "15" },
-  { id: "17000000-0000-0000-0000-000000000004", plan_exercise_id: "16000000-0000-0000-0000-000000000002", week_number: 4, sets: 4, reps: "20" },
-  { id: "17000000-0000-0000-0000-000000000005", plan_exercise_id: "16000000-0000-0000-0000-000000000003", week_number: 1, sets: 2, reps: "8" },
-  { id: "17000000-0000-0000-0000-000000000006", plan_exercise_id: "16000000-0000-0000-0000-000000000003", week_number: 2, sets: 3, reps: "10" },
-  { id: "17000000-0000-0000-0000-000000000007", plan_exercise_id: "16000000-0000-0000-0000-000000000003", week_number: 3, sets: 3, reps: "12" },
-  { id: "17000000-0000-0000-0000-000000000008", plan_exercise_id: "16000000-0000-0000-0000-000000000003", week_number: 4, sets: 4, reps: "12" },
-]
-
 // Comentarios de informe de ejemplo (mismo jugador que el plan individual,
 // para mostrar cómo se combinan en /players/:id/report).
 export const DEMO_PLAYER_REPORT_NOTES = [
@@ -317,9 +299,7 @@ export const DEMO_ID_RANGES: [table: string, start: string, end: string][] = [
   ["match_goals", "1c000000-0000-0000-0000-000000000000", "1c000000-0000-0000-0000-ffffffffffff"],
   ["match_cards", "19000000-0000-0000-0000-000000000000", "19000000-0000-0000-0000-ffffffffffff"],
   ["player_report_notes", "18000000-0000-0000-0000-000000000000", "18000000-0000-0000-0000-ffffffffffff"],
-  ["individual_plan_exercise_weeks", "17000000-0000-0000-0000-000000000000", "17000000-0000-0000-0000-ffffffffffff"],
-  ["individual_plan_exercises", "16000000-0000-0000-0000-000000000000", "16000000-0000-0000-0000-ffffffffffff"],
-  ["individual_plans", "15000000-0000-0000-0000-000000000000", "15000000-0000-0000-0000-ffffffffffff"],
+  ["routine_exercise_weeks", "17000000-0000-0000-0000-000000000000", "17000000-0000-0000-0000-ffffffffffff"],
   ["physical_tests", "13000000-0000-0000-0000-000000000000", "13000000-0000-0000-0000-ffffffffffff"],
   ["match_substitutions", "12000000-0000-0000-0000-000000000000", "12000000-0000-0000-0000-ffffffffffff"],
   ["national_payments", "1f000000-0000-0000-0000-000000000000", "1f000000-0000-0000-0000-ffffffffffff"],

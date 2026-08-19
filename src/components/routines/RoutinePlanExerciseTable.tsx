@@ -16,33 +16,32 @@ import { CSS } from "@dnd-kit/utilities"
 import { GripVertical, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
-  useRemovePlanExercise,
-  useReorderPlanExercises,
-  useSetPlanExerciseWeek,
-} from "@/hooks/useIndividualPlans"
-import type { IndividualPlanExercise } from "@/types/database"
-import { Badge } from "@/components/ui/badge"
+  useRemoveRoutineExercise,
+  useReorderRoutineExercises,
+  useSetRoutineExerciseWeek,
+} from "@/hooks/useRoutines"
+import type { RoutineExercise } from "@/types/database"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 function WeekCell({
   item,
-  planId,
+  routineId,
   week,
 }: {
-  item: IndividualPlanExercise
-  planId: string
+  item: RoutineExercise
+  routineId: string
   week: number
 }) {
-  const setWeek = useSetPlanExerciseWeek()
+  const setWeek = useSetRoutineExerciseWeek()
   const weekData = item.weeks?.find((w) => w.week_number === week)
   const [sets, setSets] = useState(weekData?.sets?.toString() ?? "")
   const [reps, setReps] = useState(weekData?.reps ?? "")
 
   function commit() {
     setWeek.mutate({
-      planId,
-      planExerciseId: item.id,
+      routineId,
+      routineExerciseId: item.id,
       weekNumber: week,
       sets: sets ? Number(sets) : null,
       reps: reps || null,
@@ -74,24 +73,24 @@ function WeekCell({
 function ExerciseTableRow({
   item,
   index,
-  planId,
+  routineId,
   weeks,
 }: {
-  item: IndividualPlanExercise
+  item: RoutineExercise
   index: number
-  planId: string
+  routineId: string
   weeks: number[]
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: item.id })
-  const removeExercise = useRemovePlanExercise()
+  const removeExercise = useRemoveRoutineExercise()
   const style = { transform: CSS.Transform.toString(transform), transition }
   const name = item.exercise?.name ?? item.ad_hoc_name ?? "Ejercicio"
 
   async function handleRemove() {
     if (!confirm(`¿Quitar "${name}" del plan?`)) return
     try {
-      await removeExercise.mutateAsync({ id: item.id, planId })
+      await removeExercise.mutateAsync({ id: item.id, routineId })
     } catch {
       toast.error("No se pudo quitar el ejercicio")
     }
@@ -109,24 +108,19 @@ function ExerciseTableRow({
           >
             <GripVertical className="size-4" />
           </button>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium">
-              {index + 1}. {name}
-            </p>
-            {item.exercise?.category && (
-              <Badge variant="outline" className="mt-0.5 text-[10px]">
-                {item.exercise.category}
-              </Badge>
-            )}
-          </div>
+          <p className="min-w-0 truncate text-sm font-medium">
+            {index + 1}. {name}
+          </p>
         </div>
       </td>
       <td className="border-b py-2 text-center text-xs text-muted-foreground">
-        {item.base_sets || item.base_reps ? `${item.base_sets ?? "-"}×${item.base_reps ?? "-"}` : "-"}
+        {item.sets_override || item.reps_override
+          ? `${item.sets_override ?? "-"}×${item.reps_override ?? "-"}`
+          : "-"}
       </td>
       {weeks.map((week) => (
         <td key={week} className="border-b py-2">
-          <WeekCell item={item} planId={planId} week={week} />
+          <WeekCell item={item} routineId={routineId} week={week} />
         </td>
       ))}
       <td className="border-b py-2 text-center">
@@ -144,16 +138,16 @@ function ExerciseTableRow({
   )
 }
 
-export function PlanExerciseTable({
-  planId,
+export function RoutinePlanExerciseTable({
+  routineId,
   items,
   durationWeeks,
 }: {
-  planId: string
-  items: IndividualPlanExercise[]
+  routineId: string
+  items: RoutineExercise[]
   durationWeeks: number
 }) {
-  const reorder = useReorderPlanExercises()
+  const reorder = useReorderRoutineExercises()
   const weeks = Array.from({ length: durationWeeks }, (_, i) => i + 1)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
@@ -168,7 +162,7 @@ export function PlanExerciseTable({
     const reordered = [...items]
     const [moved] = reordered.splice(oldIndex, 1)
     reordered.splice(newIndex, 0, moved)
-    reorder.mutate({ planId, orderedIds: reordered.map((i) => i.id) })
+    reorder.mutate({ routineId, orderedIds: reordered.map((i) => i.id) })
   }
 
   if (items.length === 0) {
@@ -202,7 +196,7 @@ export function PlanExerciseTable({
                   key={item.id}
                   item={item}
                   index={index}
-                  planId={planId}
+                  routineId={routineId}
                   weeks={weeks}
                 />
               ))}

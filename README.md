@@ -59,6 +59,7 @@ React + TypeScript + Vite · Tailwind CSS + shadcn/ui · Supabase (Postgres + Au
    - `supabase/migrations/0024_national_activity_routine_link.sql` (rutina real linkeada a la actividad del Nacional; tipo "Entrenamiento" para la parte táctica)
    - `supabase/migrations/0025_evaluations_physical_only.sql` (Evaluaciones pasa a ser un check-in físico simple, sin puntajes 1-10 ni radar — **borra los puntajes técnica/táctica/física/mental ya cargados**)
    - `supabase/migrations/0026_national_default_cost_payments.sql` (costo del viaje por defecto en Nacional; pagos como historial en vez de un solo número — **borra el "Pagado" ya cargado en pagos existentes**, hay que recargarlo como pagos)
+   - `supabase/migrations/0027_individual_plans_as_routines.sql` (Planes individuales pasa a ser Rutinas con `player_id` — mismo editor de ejercicios/grupos/circuitos, progresión semanal por ejercicio en `routine_exercise_weeks` — **borra `individual_plans` y sus ejercicios**, hay que recargarlos como Planes)
 
 4. Crear las cuentas en **Authentication → Users** (email + contraseña):
    - Tu propia cuenta de **DT**.
@@ -80,16 +81,20 @@ React + TypeScript + Vite · Tailwind CSS + shadcn/ui · Supabase (Postgres + Au
    npm run dev
    ```
 
-7. **Vincular roles**: entrá a la app con tu cuenta de DT y andá a
-   **Usuarios** (sidebar en desktop, o "Acciones rápidas" del Dashboard en
-   mobile). Ahí:
-   - Vinculá tu propia cuenta con rol **DT** (pegando tu propio UUID).
-   - Vinculá cada cuenta de Profesor/Jugador que hayas creado en el paso 4,
-     eligiendo su rol y, si es Jugador, el jugador de la lista al que
-     corresponde.
+7. **Vincular tu cuenta de DT**: entrá a la app con la cuenta que creaste en
+   el paso 4 y andá a **Usuarios** (sidebar en desktop, o "Acciones rápidas"
+   del Dashboard en mobile). Tocá "Vincular por UUID" y vinculate a vos mismo
+   con rol **DT** (pegando tu propio UUID) — este primer paso es manual sí o
+   sí, porque todavía no hay ningún DT que pueda mandar invitaciones.
 
    Hasta que una cuenta no tenga una fila en `profiles`, puede loguearse pero
    no va a tener rol asignado — no verá nada útil en la app.
+
+   De ahí en adelante, para dar de alta un **Profesor** o **Jugador**, usá
+   "Invitar por email" en la misma pantalla (ver sección "Invitar usuarios"
+   más abajo) — le llega un mail para que ponga su propia contraseña, sin que
+   tengas que crear la cuenta a mano en Supabase. "Vincular por UUID" sigue
+   disponible como respaldo manual.
 
 8. **(Opcional) Datos demo**: en la misma pantalla de **Usuarios**, con tu
    cuenta de DT, tocá "Cargar datos demo" para poblar la app con el plantel
@@ -107,12 +112,71 @@ React + TypeScript + Vite · Tailwind CSS + shadcn/ui · Supabase (Postgres + Au
 
 Si `.env.local` no está configurado, la app muestra una pantalla de instrucciones en vez de romper.
 
+## Deploy en Vercel
+
+Es una SPA (Vite + React Router, no Next.js) — Vercel la sirve como sitio
+estático. Como el servidor no conoce las rutas de React Router, pedir una
+ruta interna directo (`/players`) o recargar (F5) parado en una devuelve 404
+si no está el rewrite catch-all. `vercel.json` en la raíz ya lo resuelve:
+
+```json
+{
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
+```
+
+(El `(?!api/)` excluye `/api/*` del rewrite, para que la Vercel Function de
+invitaciones siga funcionando como función y no como una ruta de React.)
+
+En **Project Settings → Environment Variables** de Vercel hace falta cargar,
+además de `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` (las mismas de
+`.env.local`), las tres variables server-only que usa `api/invite-user.ts` —
+ver la sección siguiente.
+
+## Invitar usuarios
+
+`api/invite-user.ts` es una **Vercel Function** (no Supabase Edge Function,
+no hace falta infraestructura aparte — Vercel la detecta sola por estar en
+`api/`) que reemplaza el paso manual de crear el usuario en el dashboard de
+Supabase. El DT carga email + rol (+ jugador, si corresponde) en
+**Usuarios → Invitar por email**, la función:
+
+1. Confirma que quien llama está logueado y es DT (si no, 403).
+2. Invita el email con `supabase.auth.admin.inviteUserByEmail` — Supabase le
+   manda un mail con un link a `/aceptar-invitacion`.
+3. Inserta la fila en `profiles` (rol + jugador vinculado) directo, con la
+   service role — no depende de que la persona invitada acepte para que el
+   vínculo exista.
+
+La persona invitada entra a `/aceptar-invitacion` desde el mail (ya logueada
+por el link), pone su contraseña, y de ahí en adelante entra normal desde
+`/login` con email + esa contraseña.
+
+**Por qué necesita una función de servidor**: invitar usuarios requiere la
+*service_role key* de Supabase (permisos totales) — nunca puede estar en el
+código del frontend, porque cualquiera que abra las devtools se la lleva.
+`api/invite-user.ts` es el único lugar del proyecto donde se usa, leída de
+una variable de entorno **sin prefijo `VITE_`** (así Vite nunca la mete en
+el bundle público) que se configura solo en Vercel, nunca en `.env.local`:
+
+- `SUPABASE_URL` — la misma Project URL del frontend.
+- `SUPABASE_SERVICE_ROLE_KEY` — Supabase dashboard → Project Settings → API
+  → `service_role` (el secreto, **no** el `anon`).
+- `SITE_URL` — la URL pública del deploy (ej. `https://manager-dt.vercel.app`).
+
+Para probarlo en local hace falta `vercel dev` (no `npm run dev` solo, que
+no sirve `api/`) con esas tres variables en un `.env` que lea Vercel CLI —
+o simplemente probarlo contra el deploy de Vercel directamente.
+
 ## Scripts
 
 - `npm run dev` — servidor de desarrollo
 - `npm run build` — chequeo de TypeScript + build de producción
 - `npm run preview` — sirve el build de producción localmente
 - `npm run lint` — oxlint
+- `npm run check:api` — chequeo de TypeScript de `api/` (no está incluido en `npm run build`, corre aparte)
 
 ## Roles
 
@@ -182,21 +246,26 @@ Funcionamiento:
 
 ## Rutinas vs. Planes individuales
 
-Dos secciones separadas a propósito, no confundir:
+Un Plan individual **es** una Rutina — mismo editor de ejercicios/grupos/
+circuitos, misma biblioteca `physical_exercises` (tabla `routines`) — solo
+que con `player_id` seteado: privada de ESE jugador, no una plantilla
+reutilizable. Dos pantallas separadas a propósito porque se usan distinto,
+no por ser sistemas distintos por debajo:
 
-- **Rutinas** (`/routines`): el Profesor arma una rutina de ejercicios
-  físicos (`physical_exercises`, biblioteca propia) y la **asigna a una
-  fecha** del calendario, para toda la categoría o jugadores puntuales.
-  Sin progresión semana a semana — es "lo que se hace ese día".
-- **Planes individuales** (`/planes`): un programa propio de **un jugador**
-  (fuerza, movilidad, rehabilitación, resistencia, prevención) que corre en
-  paralelo al entrenamiento grupal, con **progresión de series/reps semana a
-  semana** por ejercicio. Reutiliza la biblioteca táctica ya existente
-  (`training_exercises`, la misma de "Ejercicios"/Entrenamientos) o permite
-  cargar un ejercicio suelto sin pasar por ninguna biblioteca. No se asigna
-  a una fecha puntual — tiene una fecha de inicio y una duración en semanas.
-  Se puede duplicar (para arrancar un plan nuevo a partir de uno existente)
-  y archivar (sin borrarlo) cuando el jugador lo termina.
+- **Rutinas** (`/routines`, `player_id` null): el Profesor arma una rutina
+  y la **asigna a una fecha** del calendario, para toda la categoría o
+  jugadores puntuales, vía `routine_assignments`. Sin progresión semana a
+  semana — es "lo que se hace ese día".
+- **Planes individuales** (`/planes`, `player_id` seteado): un programa
+  propio de **un jugador** (fuerza, movilidad, rehabilitación, resistencia,
+  prevención) que corre en paralelo al entrenamiento grupal, con
+  **progresión de series/reps semana a semana** por ejercicio
+  (`routine_exercise_weeks`). No se asigna a una fecha puntual — tiene una
+  fecha de inicio y una duración en semanas propias. Se puede duplicar (para
+  arrancar un plan nuevo a partir de uno existente) y archivar (sin
+  borrarlo) cuando el jugador lo termina. Por RLS, un Plan individual solo lo
+  ve DT/Profesor — a diferencia de una Rutina de plantilla, no es visible
+  para todo autenticado.
 
 ### Grupos y circuitos dentro de una Rutina
 
@@ -209,8 +278,8 @@ enfoque opcional — y adentro de cada grupo, **Circuitos** numerados
 automáticamente (Circuito 1, 2, 3...) con sus ejercicios, también
 numerados. Los ejercicios de un circuito salen de la biblioteca de
 `physical_exercises` o son sueltos (nombre libre, sin pasar por la
-biblioteca) — igual mecánica que Planes individuales, porque estos carteles
-suelen tener ejercicios muy puntuales que no vale la pena precargar. Se ve
+biblioteca) — estos carteles suelen tener ejercicios muy puntuales que no
+vale la pena precargar. Se ve
 como 3 columnas en escritorio (una por grupo) y apilado en mobile, y es
 imprimible (botón Imprimir). Es opcional: una rutina sin grupos se sigue
 viendo como lista plana, sin forzar la estructura en rutinas simples.

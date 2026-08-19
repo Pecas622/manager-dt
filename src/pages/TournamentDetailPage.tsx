@@ -42,15 +42,15 @@ export function TournamentDetailPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-6">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Volver">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Volver" className="shrink-0">
             <ArrowLeft />
           </Button>
-          <h1 className="text-xl font-semibold">{tournament.name}</h1>
+          <h1 className="truncate text-xl font-semibold">{tournament.name}</h1>
         </div>
         {role === "dt" && (
-          <Button variant="outline" size="icon" onClick={() => setEditOpen(true)} aria-label="Editar">
+          <Button variant="outline" size="icon" onClick={() => setEditOpen(true)} aria-label="Editar" className="shrink-0">
             <Pencil />
           </Button>
         )}

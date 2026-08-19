@@ -2,11 +2,7 @@ import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { Archive, ArchiveRestore, Copy, Pencil, Plus, Search } from "lucide-react"
 import { toast } from "sonner"
-import {
-  useDuplicateIndividualPlan,
-  useIndividualPlans,
-  useUpdateIndividualPlan,
-} from "@/hooks/useIndividualPlans"
+import { useDuplicatePlan, usePlans, useUpdateRoutine } from "@/hooks/useRoutines"
 import { INDIVIDUAL_PLAN_FOCUS_AREAS, INDIVIDUAL_PLAN_TYPES } from "@/types/domain"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,12 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { IndividualPlanCard } from "@/components/individual-plans/IndividualPlanCard"
+import { PlanCard } from "@/components/routines/PlanCard"
 
 export function IndividualPlansPage() {
-  const { data: plans, isLoading } = useIndividualPlans()
-  const duplicatePlan = useDuplicateIndividualPlan()
-  const updatePlan = useUpdateIndividualPlan()
+  const { data: plans, isLoading } = usePlans()
+  const duplicatePlan = useDuplicatePlan()
+  const updatePlan = useUpdateRoutine()
   const [search, setSearch] = useState("")
   const [type, setType] = useState("all")
   const [focusArea, setFocusArea] = useState("all")
@@ -34,7 +30,7 @@ export function IndividualPlansPage() {
     const term = search.trim().toLowerCase()
     return plans.filter((p) => {
       if (!showArchived && p.status === "Archivada") return false
-      if (type !== "all" && p.type !== type) return false
+      if (type !== "all" && p.plan_type !== type) return false
       if (focusArea !== "all" && p.focus_area !== focusArea) return false
       if (!term) return true
       const haystack = `${p.name} ${p.player?.first_name ?? ""} ${p.player?.last_name ?? ""}`.toLowerCase()
@@ -142,10 +138,10 @@ export function IndividualPlansPage() {
 
       <div className="flex flex-col gap-2">
         {filtered.map((plan) => (
-          <IndividualPlanCard
+          <PlanCard
             key={plan.id}
             plan={plan}
-            exerciseCount={plan.individual_plan_exercises.length}
+            exerciseCount={plan.routine_exercises.length}
             action={
               <div className="flex shrink-0 gap-1">
                 <Button variant="ghost" size="icon" render={<Link to={`/planes/${plan.id}/edit`} aria-label="Editar" />}>

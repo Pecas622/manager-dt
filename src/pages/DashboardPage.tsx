@@ -74,7 +74,7 @@ export function DashboardPage() {
 
       <div>
         <h2 className="mb-2 font-semibold">Jugadores</h2>
-        <div className={`grid gap-2 ${isDt ? "grid-cols-3" : "grid-cols-1"}`}>
+        <div className={`grid gap-2 ${isDt ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1"}`}>
           <Card>
             <CardContent className="py-3 text-center">
               <p className="text-2xl font-semibold">{activePlayers.length}</p>

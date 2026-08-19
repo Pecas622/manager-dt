@@ -164,16 +164,45 @@ export type PhysicalExerciseInsert = Omit<
 >
 export type PhysicalExerciseUpdate = Partial<PhysicalExerciseInsert>
 
+// `player_id` distingue una rutina de plantilla (null, asignable por fecha a
+// categoría/jugadores vía routine_assignments) de un Plan Individual (seteado
+// — privada de ESE jugador, con metadata de plan y progresión semanal por
+// ejercicio). Mismo editor de ejercicios/grupos/circuitos para las dos.
 export interface Routine {
   id: string
   name: string
   notes: string | null
   created_by: string | null
+  player_id: string | null
+  objective: string | null
+  plan_type: IndividualPlanType | null
+  focus_area: IndividualPlanFocusArea | null
+  intensity: IndividualPlanIntensity | null
+  start_date: string | null
+  duration_weeks: number | null
+  session_duration_minutes: number | null
+  status: IndividualPlanStatus
   created_at: string
   updated_at: string
+  player?: Player
 }
 
-export type RoutineInsert = Omit<Routine, "id" | "created_at" | "updated_at">
+type RoutinePlanFields =
+  | "player_id"
+  | "objective"
+  | "plan_type"
+  | "focus_area"
+  | "intensity"
+  | "start_date"
+  | "duration_weeks"
+  | "session_duration_minutes"
+  | "status"
+
+export type RoutineInsert = Omit<
+  Routine,
+  "id" | "created_at" | "updated_at" | "player" | RoutinePlanFields
+> &
+  Partial<Pick<Routine, RoutinePlanFields>>
 
 export interface RoutineGroup {
   id: string
@@ -207,12 +236,23 @@ export interface RoutineExercise {
   notes: string | null
   created_at: string
   exercise?: PhysicalExercise
+  weeks?: RoutineExerciseWeek[]
 }
 
 export type RoutineExerciseInsert = Omit<
   RoutineExercise,
-  "id" | "created_at" | "exercise"
+  "id" | "created_at" | "exercise" | "weeks"
 >
+
+export interface RoutineExerciseWeek {
+  id: string
+  routine_exercise_id: string
+  week_number: number
+  sets: number | null
+  reps: string | null
+}
+
+export type RoutineExerciseWeekInsert = Omit<RoutineExerciseWeek, "id">
 
 export interface RoutineAssignment {
   id: string
@@ -481,61 +521,6 @@ export interface NationalPayment {
 }
 
 export type NationalPaymentInsert = Omit<NationalPayment, "id" | "created_at">
-
-export interface IndividualPlan {
-  id: string
-  player_id: string
-  name: string
-  objective: string | null
-  description: string | null
-  type: IndividualPlanType
-  focus_area: IndividualPlanFocusArea
-  start_date: string
-  duration_weeks: number
-  session_duration_minutes: number | null
-  intensity: IndividualPlanIntensity
-  status: IndividualPlanStatus
-  notes: string | null
-  created_by: string | null
-  created_at: string
-  updated_at: string
-  player?: Player
-}
-
-export type IndividualPlanInsert = Omit<
-  IndividualPlan,
-  "id" | "created_at" | "updated_at" | "player"
->
-export type IndividualPlanUpdate = Partial<IndividualPlanInsert>
-
-export interface IndividualPlanExercise {
-  id: string
-  plan_id: string
-  exercise_id: string | null
-  ad_hoc_name: string | null
-  order: number
-  base_sets: number | null
-  base_reps: string | null
-  notes: string | null
-  created_at: string
-  exercise?: TrainingExercise
-  weeks?: IndividualPlanExerciseWeek[]
-}
-
-export type IndividualPlanExerciseInsert = Omit<
-  IndividualPlanExercise,
-  "id" | "created_at" | "exercise" | "weeks"
->
-
-export interface IndividualPlanExerciseWeek {
-  id: string
-  plan_exercise_id: string
-  week_number: number
-  sets: number | null
-  reps: string | null
-}
-
-export type IndividualPlanExerciseWeekInsert = Omit<IndividualPlanExerciseWeek, "id">
 
 export interface PlayerReportNote {
   id: string

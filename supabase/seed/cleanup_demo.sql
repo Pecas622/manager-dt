@@ -18,14 +18,8 @@ delete from match_injury_notes
 delete from match_goals
   where id between '1c000000-0000-0000-0000-000000000000' and '1c000000-0000-0000-0000-ffffffffffff';
 
-delete from individual_plan_exercise_weeks
+delete from routine_exercise_weeks
   where id between '17000000-0000-0000-0000-000000000000' and '17000000-0000-0000-0000-ffffffffffff';
-
-delete from individual_plan_exercises
-  where id between '16000000-0000-0000-0000-000000000000' and '16000000-0000-0000-0000-ffffffffffff';
-
-delete from individual_plans
-  where id between '15000000-0000-0000-0000-000000000000' and '15000000-0000-0000-0000-ffffffffffff';
 
 delete from physical_tests
   where id between '13000000-0000-0000-0000-000000000000' and '13000000-0000-0000-0000-ffffffffffff';

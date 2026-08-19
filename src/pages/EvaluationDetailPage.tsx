@@ -46,13 +46,13 @@ export function EvaluationDetailPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-6">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Volver">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Volver" className="shrink-0">
             <ArrowLeft />
           </Button>
-          <div>
-            <h1 className="text-xl font-semibold">
+          <div className="min-w-0">
+            <h1 className="truncate text-xl font-semibold">
               <Link to={`/players/${evaluation.player_id}`} className="hover:underline">
                 {evaluation.player?.first_name} {evaluation.player?.last_name}
               </Link>
@@ -63,7 +63,7 @@ export function EvaluationDetailPage() {
             </p>
           </div>
         </div>
-        <Button variant="destructive" size="icon" onClick={handleDelete} aria-label="Eliminar">
+        <Button variant="destructive" size="icon" onClick={handleDelete} aria-label="Eliminar" className="shrink-0">
           <Trash2 />
         </Button>
       </div>

@@ -123,15 +123,15 @@ export function MatchDetailPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-6">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Volver">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Volver" className="shrink-0">
             <ArrowLeft />
           </Button>
-          <h1 className="text-xl font-semibold">vs. {match.opponent}</h1>
+          <h1 className="truncate text-xl font-semibold">vs. {match.opponent}</h1>
         </div>
         {role === "dt" && (
-          <div className="flex gap-1.5">
+          <div className="flex shrink-0 gap-1.5">
             <Button variant="outline" size="icon" onClick={() => setEditOpen(true)} aria-label="Editar">
               <Pencil />
             </Button>
@@ -166,7 +166,7 @@ export function MatchDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
             Planilla del partido
             <span className="text-sm font-normal text-muted-foreground">
               {totalMinutes}' · {totalGoals} goles · {totalAmarillas} amarillas · {totalAzules} azules
@@ -202,7 +202,7 @@ export function MatchDetailPage() {
               {summaryRows.map(({ player, minutes, goalCount, amarillas, azules, injury }) => (
                 <div key={player.id} className="flex flex-col gap-1 py-2 first:pt-0 last:pb-0">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium">
+                    <span className="min-w-0 truncate text-sm font-medium">
                       {player.first_name} {player.last_name}
                     </span>
                     <div className="flex shrink-0 items-center gap-3 text-sm tabular-nums">

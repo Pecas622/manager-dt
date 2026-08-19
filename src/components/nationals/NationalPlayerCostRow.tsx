@@ -9,6 +9,7 @@ import {
   useUpdateNationalPlayerCost,
 } from "@/hooks/useNationals"
 import type { NationalPlayerCost } from "@/types/database"
+import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -91,19 +92,20 @@ export function NationalPlayerCostRow({
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <p className="font-medium">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="min-w-0 truncate font-medium">
             {cost.player?.first_name} {cost.player?.last_name}
           </p>
           <Badge
             variant="outline"
-            className={
+            className={cn(
+              "shrink-0",
               status === "pagado"
                 ? "border-success/40 text-success"
                 : status === "parcial"
                   ? "border-warning/40 text-warning"
                   : "border-destructive/40 text-destructive"
-            }
+            )}
           >
             {status === "pagado" ? "Pagado" : status === "parcial" ? `Debe ${fmt(total - paid)}` : "Pendiente"}
           </Badge>

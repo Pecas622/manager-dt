@@ -154,7 +154,7 @@ export function PlayerDetailPage() {
               {player.notes || "Sin registrar."}
             </CardContent>
           </Card>
-          <div className="grid grid-cols-3 gap-3 text-sm">
+          <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
             <Card>
               <CardContent className="py-3">
                 <p className="text-xs text-muted-foreground">Nacimiento</p>
