@@ -4,11 +4,14 @@ import { es } from "date-fns/locale"
 import { Pencil, Plus, Trash2, Trophy } from "lucide-react"
 import { toast } from "sonner"
 import { useDeleteNational, useNationals } from "@/hooks/useNationals"
+import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function NationalsPage() {
+  const { role } = useAuth()
+  const isDt = role === "dt"
   const { data: nationals, isLoading } = useNationals()
   const deleteNational = useDeleteNational()
 
@@ -26,9 +29,11 @@ export function NationalsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Nacional</h1>
-        <Button render={<Link to="/nationals/new" />} className="h-10">
-          <Plus /> Nuevo Nacional
-        </Button>
+        {isDt && (
+          <Button render={<Link to="/nationals/new" />} className="h-10">
+            <Plus /> Nuevo Nacional
+          </Button>
+        )}
       </div>
 
       {isLoading && (
@@ -62,24 +67,26 @@ export function NationalsPage() {
                   </p>
                 </div>
               </Link>
-              <div className="flex shrink-0 gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  render={<Link to={`/nationals/${n.id}/edit`} aria-label="Editar" />}
-                >
-                  <Pencil className="size-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(n.id, n.name)}
-                  className="text-destructive hover:text-destructive"
-                  aria-label="Eliminar"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              </div>
+              {isDt && (
+                <div className="flex shrink-0 gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    render={<Link to={`/nationals/${n.id}/edit`} aria-label="Editar" />}
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(n.id, n.name)}
+                    className="text-destructive hover:text-destructive"
+                    aria-label="Eliminar"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}

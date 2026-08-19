@@ -60,6 +60,7 @@ React + TypeScript + Vite · Tailwind CSS + shadcn/ui · Supabase (Postgres + Au
    - `supabase/migrations/0025_evaluations_physical_only.sql` (Evaluaciones pasa a ser un check-in físico simple, sin puntajes 1-10 ni radar — **borra los puntajes técnica/táctica/física/mental ya cargados**)
    - `supabase/migrations/0026_national_default_cost_payments.sql` (costo del viaje por defecto en Nacional; pagos como historial en vez de un solo número — **borra el "Pagado" ya cargado en pagos existentes**, hay que recargarlo como pagos)
    - `supabase/migrations/0027_individual_plans_as_routines.sql` (Planes individuales pasa a ser Rutinas con `player_id` — mismo editor de ejercicios/grupos/circuitos, progresión semanal por ejercicio en `routine_exercise_weeks` — **borra `individual_plans` y sus ejercicios**, hay que recargarlos como Planes)
+   - `supabase/migrations/0028_national_profesor_calendar_access.sql` (el Profesor puede ver el Nacional y planificar el Calendario físico; Gastos/Jugadores siguen siendo DT-only)
 
 4. Crear las cuentas en **Authentication → Users** (email + contraseña):
    - Tu propia cuenta de **DT**.
@@ -207,7 +208,12 @@ o simplemente probarlo contra el deploy de Vercel directamente.
   Puede editar datos de la ficha del jugador (incluido el número de
   camiseta) y de un partido ya cargado (resultado, faltas), pero no dar de
   alta ni eliminar jugadores, ni crear/eliminar Torneos o Partidos — eso
-  sigue siendo exclusivo del DT.
+  sigue siendo exclusivo del DT. En **Nacional** entra a ver la lista y el
+  **Calendario** de cada Nacional (fechas, info, y cargar ahí mismo las
+  actividades físicas del día — movilidad, activación, rutinas), para
+  planificar la parte física de la gira; no ve las pestañas Jugadores ni
+  Gastos (plantel, costos y pagos), ni puede crear, editar o eliminar el
+  Nacional en sí — eso sigue siendo exclusivo del DT.
 - **Jugador**: solo lectura. Ve "Mi semana" — sus entrenamientos, rutinas y
   partidos de la semana actual, con el detalle al tocar cada actividad (series,
   repeticiones, descansos, video, imagen, indicaciones). Sin evaluaciones, sin

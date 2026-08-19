@@ -109,7 +109,7 @@ export const router = createBrowserRouter([
       {
         path: "/nationals",
         element: (
-          <ProtectedRoute allow={["dt"]}>
+          <ProtectedRoute allow={["dt", "profesor"]}>
             <NationalsPage />
           </ProtectedRoute>
         ),
@@ -125,7 +125,7 @@ export const router = createBrowserRouter([
       {
         path: "/nationals/:id",
         element: (
-          <ProtectedRoute allow={["dt"]}>
+          <ProtectedRoute allow={["dt", "profesor"]}>
             <NationalDetailPage />
           </ProtectedRoute>
         ),

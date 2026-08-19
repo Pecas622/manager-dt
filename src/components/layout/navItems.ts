@@ -39,7 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/evaluations", label: "Evaluaciones", icon: ClipboardList, roles: ["dt"], group: "Plantel" },
   { to: "/exercises", label: "Ejercicios", icon: Library, roles: ["dt", "profesor"], desktopOnly: true, group: "Entrenamiento" },
   { to: "/physical-tests", label: "Tests físicos", icon: Ruler, roles: ["dt", "profesor"], desktopOnly: true, group: "Plantel" },
-  { to: "/nationals", label: "Nacional", icon: Trophy, roles: ["dt"], desktopOnly: true, group: "Competencia" },
+  { to: "/nationals", label: "Nacional", icon: Trophy, roles: ["dt", "profesor"], desktopOnly: true, group: "Competencia" },
   { to: "/becados", label: "Ingreso", icon: IdCard, roles: ["dt"], desktopOnly: true, group: "Club" },
   { to: "/users", label: "Usuarios", icon: UserCog, roles: ["dt"], desktopOnly: true, group: "Club" },
 ]

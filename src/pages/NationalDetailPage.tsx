@@ -15,6 +15,7 @@ import {
 } from "@/hooks/useNationals"
 import type { NationalActivity } from "@/types/database"
 import { usePlayers } from "@/hooks/usePlayers"
+import { useAuth } from "@/hooks/useAuth"
 import { NATIONAL_ACTIVITY_LABELS } from "@/types/domain"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -35,6 +36,8 @@ function fmt(value: number) {
 export function NationalDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { role } = useAuth()
+  const isDt = role === "dt"
   const { data: national, isLoading } = useNational(id)
   const { data: activities } = useNationalActivities(id)
   const { data: expenses } = useNationalExpenses(id)
@@ -122,14 +125,16 @@ export function NationalDetailPage() {
           </Button>
           <h1 className="truncate text-xl font-semibold">{national.name}</h1>
         </div>
-        <div className="flex shrink-0 gap-1.5">
-          <Button variant="outline" size="icon" render={<Link to={`/nationals/${national.id}/edit`} aria-label="Editar" />}>
-            <Pencil />
-          </Button>
-          <Button variant="destructive" size="icon" onClick={handleDeleteNational} aria-label="Eliminar">
-            <Trash2 />
-          </Button>
-        </div>
+        {isDt && (
+          <div className="flex shrink-0 gap-1.5">
+            <Button variant="outline" size="icon" render={<Link to={`/nationals/${national.id}/edit`} aria-label="Editar" />}>
+              <Pencil />
+            </Button>
+            <Button variant="destructive" size="icon" onClick={handleDeleteNational} aria-label="Eliminar">
+              <Trash2 />
+            </Button>
+          </div>
+        )}
       </div>
 
       <Card>
@@ -153,8 +158,8 @@ export function NationalDetailPage() {
       <Tabs defaultValue="calendario">
         <TabsList className="w-full">
           <TabsTrigger value="calendario">Calendario</TabsTrigger>
-          <TabsTrigger value="jugadores">Jugadores</TabsTrigger>
-          <TabsTrigger value="gastos">Gastos</TabsTrigger>
+          {isDt && <TabsTrigger value="jugadores">Jugadores</TabsTrigger>}
+          {isDt && <TabsTrigger value="gastos">Gastos</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="calendario" className="mt-4 flex flex-col gap-3">
@@ -230,102 +235,106 @@ export function NationalDetailPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="jugadores" className="mt-4 flex flex-col gap-3">
-          <Button
-            className="h-11 self-start"
-            onClick={() => setAddPlayersDialog(true)}
-            disabled={availablePlayers.length === 0}
-          >
-            <UserPlus /> Agregar jugadores al plantel
-          </Button>
+        {isDt && (
+          <TabsContent value="jugadores" className="mt-4 flex flex-col gap-3">
+            <Button
+              className="h-11 self-start"
+              onClick={() => setAddPlayersDialog(true)}
+              disabled={availablePlayers.length === 0}
+            >
+              <UserPlus /> Agregar jugadores al plantel
+            </Button>
 
-          {playerCosts?.length === 0 && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Todavía no agregaste jugadores al plantel de este Nacional.
-            </p>
-          )}
+            {playerCosts?.length === 0 && (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                Todavía no agregaste jugadores al plantel de este Nacional.
+              </p>
+            )}
 
-          <div className="flex flex-col gap-2">
-            {playerCosts?.map((cost) => (
-              <NationalPlayerStatsRow key={cost.id} cost={cost} nationalId={national.id} />
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="gastos" className="mt-4 flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-2 text-center">
-            <Card>
-              <CardContent className="py-3">
-                <p className="text-lg font-semibold">{fmt(totals.costTotal)}</p>
-                <p className="text-[11px] text-muted-foreground">Costo total jugadores</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="py-3">
-                <p className="text-lg font-semibold">{fmt(totals.paidTotal)}</p>
-                <p className="text-[11px] text-muted-foreground">Pagado</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <NationalDefaultCostCard national={national} playerCosts={playerCosts ?? []} />
-
-          {playerCosts?.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted-foreground">
-              Todavía no agregaste jugadores al plantel (se hace desde Jugadores).
-            </p>
-          ) : (
             <div className="flex flex-col gap-2">
               {playerCosts?.map((cost) => (
-                <NationalPlayerCostRow key={cost.id} cost={cost} nationalId={national.id} />
+                <NationalPlayerStatsRow key={cost.id} cost={cost} nationalId={national.id} />
               ))}
             </div>
-          )}
+          </TabsContent>
+        )}
 
-          <Card>
-            <CardContent className="text-center">
-              <p className="text-lg font-semibold">{fmt(totals.expenseTotal)}</p>
-              <p className="text-[11px] text-muted-foreground">Gastos generales</p>
-            </CardContent>
-          </Card>
-
-          <Button className="h-10 self-start" onClick={() => setExpenseDialog(true)}>
-            <Plus /> Nuevo gasto
-          </Button>
-
-          {expenses?.length === 0 && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Todavía no cargaste gastos.
-            </p>
-          )}
-
-          <div className="flex flex-col gap-2">
-            {expenses?.map((e) => (
-              <Card key={e.id}>
-                <CardContent className="flex items-center justify-between gap-3 py-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{e.category}</Badge>
-                      <span className="font-semibold">{fmt(Number(e.amount))}</span>
-                    </div>
-                    {e.description && (
-                      <p className="text-sm text-muted-foreground">{e.description}</p>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteExpense.mutate({ id: e.id, nationalId: national.id })}
-                    className="shrink-0 text-destructive hover:text-destructive"
-                    aria-label="Eliminar"
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+        {isDt && (
+          <TabsContent value="gastos" className="mt-4 flex flex-col gap-3">
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <Card>
+                <CardContent className="py-3">
+                  <p className="text-lg font-semibold">{fmt(totals.costTotal)}</p>
+                  <p className="text-[11px] text-muted-foreground">Costo total jugadores</p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </TabsContent>
+              <Card>
+                <CardContent className="py-3">
+                  <p className="text-lg font-semibold">{fmt(totals.paidTotal)}</p>
+                  <p className="text-[11px] text-muted-foreground">Pagado</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <NationalDefaultCostCard national={national} playerCosts={playerCosts ?? []} />
+
+            {playerCosts?.length === 0 ? (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                Todavía no agregaste jugadores al plantel (se hace desde Jugadores).
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {playerCosts?.map((cost) => (
+                  <NationalPlayerCostRow key={cost.id} cost={cost} nationalId={national.id} />
+                ))}
+              </div>
+            )}
+
+            <Card>
+              <CardContent className="text-center">
+                <p className="text-lg font-semibold">{fmt(totals.expenseTotal)}</p>
+                <p className="text-[11px] text-muted-foreground">Gastos generales</p>
+              </CardContent>
+            </Card>
+
+            <Button className="h-10 self-start" onClick={() => setExpenseDialog(true)}>
+              <Plus /> Nuevo gasto
+            </Button>
+
+            {expenses?.length === 0 && (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                Todavía no cargaste gastos.
+              </p>
+            )}
+
+            <div className="flex flex-col gap-2">
+              {expenses?.map((e) => (
+                <Card key={e.id}>
+                  <CardContent className="flex items-center justify-between gap-3 py-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">{e.category}</Badge>
+                        <span className="font-semibold">{fmt(Number(e.amount))}</span>
+                      </div>
+                      {e.description && (
+                        <p className="text-sm text-muted-foreground">{e.description}</p>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteExpense.mutate({ id: e.id, nationalId: national.id })}
+                      className="shrink-0 text-destructive hover:text-destructive"
+                      aria-label="Eliminar"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
 
       <NationalActivityFormDialog
