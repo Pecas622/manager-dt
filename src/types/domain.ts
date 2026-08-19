@@ -16,7 +16,15 @@ export type BecadoStatus = (typeof BECADO_STATUSES)[number]
 export const MEMBER_TYPES = ["Becado", "Cuota"] as const
 export type MemberType = (typeof MEMBER_TYPES)[number]
 
-export const POSITIONS = ["Arquero", "Cierre", "Ala", "Pivot", "Universal", "Sin definir"] as const
+export const POSITIONS = [
+  "Arquero",
+  "Cierre",
+  "Ala",
+  "Pivot",
+  "Universal",
+  "Poste-ala",
+  "Sin definir",
+] as const
 export type Position = (typeof POSITIONS)[number]
 
 export const PLAYER_DOCUMENT_TYPES = ["DNI", "Certificado médico", "Otro"] as const

@@ -8,6 +8,7 @@ const POSITION_STYLES: Record<Position, string> = {
   Ala: "bg-chart-1/15 text-chart-1",
   Pivot: "bg-chart-3/15 text-chart-3",
   Universal: "bg-chart-2/15 text-chart-2",
+  "Poste-ala": "bg-violet-400/15 text-violet-600 dark:text-violet-400",
   "Sin definir": "bg-muted text-muted-foreground",
 }
 
