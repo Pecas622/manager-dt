@@ -61,6 +61,7 @@ React + TypeScript + Vite · Tailwind CSS + shadcn/ui · Supabase (Postgres + Au
    - `supabase/migrations/0026_national_default_cost_payments.sql` (costo del viaje por defecto en Nacional; pagos como historial en vez de un solo número — **borra el "Pagado" ya cargado en pagos existentes**, hay que recargarlo como pagos)
    - `supabase/migrations/0027_individual_plans_as_routines.sql` (Planes individuales pasa a ser Rutinas con `player_id` — mismo editor de ejercicios/grupos/circuitos, progresión semanal por ejercicio en `routine_exercise_weeks` — **borra `individual_plans` y sus ejercicios**, hay que recargarlos como Planes)
    - `supabase/migrations/0028_national_profesor_calendar_access.sql` (el Profesor puede ver el Nacional y planificar el Calendario físico; Gastos/Jugadores siguen siendo DT-only)
+   - `supabase/migrations/0029_physical_test_reps.sql` (repeticiones cm+ms por test de salto — Squat Jump, Drop Jump —, con mayor valor y promedio calculados solos)
 
 4. Crear las cuentas en **Authentication → Users** (email + contraseña):
    - Tu propia cuenta de **DT**.
@@ -189,7 +190,9 @@ o simplemente probarlo contra el deploy de Vercel directamente.
   calendario (a toda la categoría o a jugadores puntuales); completa la
   **Planilla del partido** (en el detalle de cada partido, dentro de
   **Partidos**) con los minutos jugados de cada jugador por tramos de
-  entrada/salida (el total sale de sumarlos), sus goles, sus tarjetas
+  entrada/salida — se cargan por tiempo (1er/2do, cada uno arranca de 0,
+  igual que en la planilla de papel), y el total del partido sale de sumar
+  los dos—, sus goles, sus tarjetas
   —amarilla (amonestación) o azul (exclusión temporal de 2 minutos, no hay
   roja)—, cada evento con el minuto opcional, molestias musculares (texto
   libre) y el número de camiseta si hace falta corregirlo — todo se ve
@@ -354,6 +357,21 @@ pisar los anteriores. Se "descarga" con el botón Imprimir del navegador
 solo. No confundir con "informes automáticos", que sigue fuera de alcance:
 esto no corre en background, no se programa ni se manda por WhatsApp/email;
 es un resumen bajo demanda de datos que el Profesor ya cargó a mano.
+
+## Tests físicos: Squat Jump y Drop Jump por repeticiones
+
+Los tests de salto en plataforma (Squat Jump, Drop Jump) se toman en varias
+repeticiones, cada una con dos lecturas — cm (altura) y ms (tiempo de
+vuelo) — de donde sale el mayor valor y el promedio, igual que la planilla
+del profe. En **Tests físicos → Nuevo registro**, al elegir uno de esos dos
+tipos de salto el formulario cambia a una grilla de repeticiones (cm + ms
+por fila, se pueden agregar más) en vez de un solo campo de valor; el mayor
+valor y el promedio se calculan solos a medida que cargás. El registro
+guarda el mayor valor en cm como el número principal del test (se ve en
+listas, en la ficha del jugador, en Evaluaciones) y el detalle de cada
+repetición queda aparte, en `physical_test_reps`, para quien lo necesite. El
+resto de los tests (CMJ, salto horizontal, velocidad) siguen siendo un solo
+valor, sin repeticiones — no se les cambió nada.
 
 ## Evaluaciones
 

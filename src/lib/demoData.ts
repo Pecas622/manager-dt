@@ -268,6 +268,14 @@ export const DEMO_PHYSICAL_TESTS = [
   { id: "13000000-0000-0000-0000-000000000004", player_id: "10000000-0000-0000-0000-000000000004", date: "2026-04-01", test_name: "Velocidad 20m", value: 3.1, unit: "s", notes: null, created_by: null },
   { id: "13000000-0000-0000-0000-000000000005", player_id: "10000000-0000-0000-0000-000000000005", date: "2026-04-01", test_name: "Salto vertical (CMJ)", value: 46, unit: "cm", notes: null, created_by: null },
   { id: "13000000-0000-0000-0000-000000000006", player_id: "10000000-0000-0000-0000-000000000005", date: "2026-04-01", test_name: "Velocidad 15m", value: 2.28, unit: "s", notes: null, created_by: null },
+  { id: "13000000-0000-0000-0000-000000000007", player_id: "10000000-0000-0000-0000-000000000001", date: "2026-07-15", test_name: "Squat Jump", value: 34.44, unit: "cm", notes: null, created_by: null },
+]
+
+// Repeticiones (cm + ms) del Squat Jump de arriba — mismo formato que la
+// planilla del profe (Mayor Valor = 34.44 cm de la repetición 2).
+export const DEMO_PHYSICAL_TEST_REPS = [
+  { id: "13100000-0000-0000-0000-000000000001", test_id: "13000000-0000-0000-0000-000000000007", rep_number: 1, value_cm: 34.18, value_ms: 528 },
+  { id: "13100000-0000-0000-0000-000000000002", test_id: "13000000-0000-0000-0000-000000000007", rep_number: 2, value_cm: 34.44, value_ms: 530 },
 ]
 
 // Becados de ejemplo (DNIs ficticios, no corresponden a personas reales).
@@ -300,6 +308,7 @@ export const DEMO_ID_RANGES: [table: string, start: string, end: string][] = [
   ["match_cards", "19000000-0000-0000-0000-000000000000", "19000000-0000-0000-0000-ffffffffffff"],
   ["player_report_notes", "18000000-0000-0000-0000-000000000000", "18000000-0000-0000-0000-ffffffffffff"],
   ["routine_exercise_weeks", "17000000-0000-0000-0000-000000000000", "17000000-0000-0000-0000-ffffffffffff"],
+  ["physical_test_reps", "13100000-0000-0000-0000-000000000000", "13100000-0000-0000-0000-ffffffffffff"],
   ["physical_tests", "13000000-0000-0000-0000-000000000000", "13000000-0000-0000-0000-ffffffffffff"],
   ["match_substitutions", "12000000-0000-0000-0000-000000000000", "12000000-0000-0000-0000-ffffffffffff"],
   ["national_payments", "1f000000-0000-0000-0000-000000000000", "1f000000-0000-0000-0000-ffffffffffff"],

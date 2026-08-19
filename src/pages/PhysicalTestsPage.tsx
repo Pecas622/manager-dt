@@ -3,7 +3,8 @@ import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
 import { Plus, Ruler, Search, Trash2 } from "lucide-react"
 import { toast } from "sonner"
-import { useDeletePhysicalTest, usePhysicalTests } from "@/hooks/usePhysicalTests"
+import { summarizeReps, useDeletePhysicalTest, usePhysicalTests } from "@/hooks/usePhysicalTests"
+import { JUMP_MS_UNIT } from "@/types/domain"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -111,14 +112,25 @@ export function PhysicalTestsPage() {
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {test.test_name} · {format(parseISO(test.date), "d MMM yyyy", { locale: es })}
+                    {test.reps && test.reps.length > 0 ? ` · ${test.reps.length} rep.` : ""}
                   </p>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <span className="text-base font-semibold">
-                  {test.value}
-                  {test.unit ? ` ${test.unit}` : ""}
-                </span>
+                <div className="text-right">
+                  <p className="text-base font-semibold leading-tight">
+                    {test.value}
+                    {test.unit ? ` ${test.unit}` : ""}
+                  </p>
+                  {test.reps && test.reps.length > 0 && (() => {
+                    const { bestMs } = summarizeReps(test.reps)
+                    return bestMs != null ? (
+                      <p className="text-xs leading-tight text-muted-foreground">
+                        {bestMs.toFixed(0)} {JUMP_MS_UNIT}
+                      </p>
+                    ) : null
+                  })()}
+                </div>
                 <Button
                   variant="ghost"
                   size="icon"

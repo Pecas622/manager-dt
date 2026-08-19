@@ -2,7 +2,10 @@ import { useState } from "react"
 import { Goal, HeartPulse, Plus, Square, X } from "lucide-react"
 import { toast } from "sonner"
 import {
+  MATCH_HALF_MINUTES,
+  segmentDisplayParts,
   sumMinutes,
+  sumMinutesByHalf,
   useAddSubstitution,
   useDeleteSubstitution,
 } from "@/hooks/useMatchSubstitutions"
@@ -44,6 +47,7 @@ export function MatchPlanillaRow({
   const deleteGoal = useDeleteGoal()
   const setInjuryNote = useSetInjuryNote()
   const updatePlayer = useUpdatePlayer()
+  const [half, setHalf] = useState<1 | 2>(1)
   const [inMinute, setInMinute] = useState("")
   const [outMinute, setOutMinute] = useState("")
   const [cardMinute, setCardMinute] = useState("")
@@ -53,6 +57,7 @@ export function MatchPlanillaRow({
   const [injury, setInjury] = useState(injuryNote)
 
   const totalMinutes = sumMinutes(segments)
+  const halfTotals = sumMinutesByHalf(segments)
   const amarillasCount = cards.filter((c) => c.type === "Amarilla").length
   const azulesCount = cards.filter((c) => c.type === "Azul").length
 
@@ -68,22 +73,27 @@ export function MatchPlanillaRow({
   }
 
   async function handleAddSegment() {
-    const inValue = Number(inMinute)
-    const outValue = Number(outMinute)
-    if (!inMinute || !outMinute || !Number.isFinite(inValue) || !Number.isFinite(outValue)) {
+    const localIn = Number(inMinute)
+    const localOut = Number(outMinute)
+    if (!inMinute || !outMinute || !Number.isFinite(localIn) || !Number.isFinite(localOut)) {
       toast.error("Cargá minuto de entrada y salida")
       return
     }
-    if (outValue < inValue) {
+    if (localIn < 0 || localOut > MATCH_HALF_MINUTES) {
+      toast.error(`El minuto tiene que estar entre 0 y ${MATCH_HALF_MINUTES}`)
+      return
+    }
+    if (localOut < localIn) {
       toast.error("El minuto de salida no puede ser antes que el de entrada")
       return
     }
+    const offset = (half - 1) * MATCH_HALF_MINUTES
     try {
       await addSubstitution.mutateAsync({
         match_id: matchId,
         player_id: player.id,
-        in_minute: inValue,
-        out_minute: outValue,
+        in_minute: offset + localIn,
+        out_minute: offset + localOut,
       })
       setInMinute("")
       setOutMinute("")
@@ -197,43 +207,69 @@ export function MatchPlanillaRow({
       </div>
 
       <div className="flex flex-col gap-1.5 rounded-lg bg-muted/40 p-2">
-        <p className="text-[11px] font-medium text-muted-foreground">Minutos</p>
+        <div className="flex items-center justify-between">
+          <p className="text-[11px] font-medium text-muted-foreground">Minutos</p>
+          <p className="text-[11px] tabular-nums text-muted-foreground">
+            1er T. {halfTotals.firstHalf}' · 2do T. {halfTotals.secondHalf}' · Total {totalMinutes}'
+          </p>
+        </div>
         {segments.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {segments.map((s) => (
-              <span
-                key={s.id}
-                className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs"
-              >
-                {s.in_minute}'–{s.out_minute}'
-                <button
-                  onClick={() => handleRemoveSegment(s.id)}
-                  aria-label="Quitar tramo"
-                  className="text-muted-foreground hover:text-destructive"
+            {segments.map((s) =>
+              segmentDisplayParts(s).map((part) => (
+                <span
+                  key={`${s.id}-${part.half}`}
+                  className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs"
                 >
-                  <X className="size-3" />
-                </button>
-              </span>
-            ))}
+                  {part.half === 1 ? "1erT" : "2doT"} {part.from}'–{part.to}'
+                  <button
+                    onClick={() => handleRemoveSegment(s.id)}
+                    aria-label="Quitar tramo"
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </span>
+              ))
+            )}
           </div>
         )}
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex overflow-hidden rounded-md border">
+            {([1, 2] as const).map((h) => (
+              <button
+                key={h}
+                type="button"
+                onClick={() => setHalf(h)}
+                className={cn(
+                  "px-2 py-1.5 text-xs font-medium transition-colors",
+                  half === h
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-accent"
+                )}
+              >
+                {h === 1 ? "1er T." : "2do T."}
+              </button>
+            ))}
+          </div>
           <Input
             type="number"
             min={0}
+            max={MATCH_HALF_MINUTES}
             placeholder="Entró"
             value={inMinute}
             onChange={(e) => setInMinute(e.target.value)}
-            className="h-8 w-20 text-center text-xs"
+            className="h-8 w-16 text-center text-xs"
           />
           <span className="text-xs text-muted-foreground">a</span>
           <Input
             type="number"
             min={0}
+            max={MATCH_HALF_MINUTES}
             placeholder="Salió"
             value={outMinute}
             onChange={(e) => setOutMinute(e.target.value)}
-            className="h-8 w-20 text-center text-xs"
+            className="h-8 w-16 text-center text-xs"
           />
           <Button
             variant="outline"

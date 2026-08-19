@@ -382,12 +382,23 @@ export interface PhysicalTest {
   created_by: string | null
   created_at: string
   player?: Player
+  reps?: PhysicalTestRep[]
 }
 
 export type PhysicalTestInsert = Omit<
   PhysicalTest,
-  "id" | "created_at" | "player"
+  "id" | "created_at" | "player" | "reps"
 >
+
+export interface PhysicalTestRep {
+  id: string
+  test_id: string
+  rep_number: number
+  value_cm: number | null
+  value_ms: number | null
+}
+
+export type PhysicalTestRepInsert = Omit<PhysicalTestRep, "id">
 
 export interface Becado {
   id: string

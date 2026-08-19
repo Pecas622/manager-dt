@@ -379,10 +379,23 @@ insert into physical_tests (id, player_id, date, test_name, value, unit, notes, 
 ('13000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', '2026-07-15', 'Salto vertical (CMJ)', 44, 'cm', null, null),
 ('13000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000004', '2026-04-01', 'Velocidad 20m', 3.10, 's', null, null),
 ('13000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000005', '2026-04-01', 'Salto vertical (CMJ)', 46, 'cm', null, null),
-('13000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000005', '2026-04-01', 'Velocidad 15m', 2.28, 's', null, null)
+('13000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000005', '2026-04-01', 'Velocidad 15m', 2.28, 's', null, null),
+('13000000-0000-0000-0000-000000000007', '10000000-0000-0000-0000-000000000001', '2026-07-15', 'Squat Jump', 34.44, 'cm', null, null)
 on conflict (id) do update set
   player_id = excluded.player_id, date = excluded.date, test_name = excluded.test_name,
   value = excluded.value, unit = excluded.unit, notes = excluded.notes;
+
+-- =========================================================
+-- physical_test_reps (repeticiones cm+ms del Squat Jump de arriba)
+-- prefijo 13100000-0000-0000-0000-0000000000xx
+-- Requiere haber corrido 0029_physical_test_reps.sql.
+-- =========================================================
+insert into physical_test_reps (id, test_id, rep_number, value_cm, value_ms) values
+('13100000-0000-0000-0000-000000000001', '13000000-0000-0000-0000-000000000007', 1, 34.18, 528),
+('13100000-0000-0000-0000-000000000002', '13000000-0000-0000-0000-000000000007', 2, 34.44, 530)
+on conflict (id) do update set
+  test_id = excluded.test_id, rep_number = excluded.rep_number,
+  value_cm = excluded.value_cm, value_ms = excluded.value_ms;
 
 -- =========================================================
 -- becados y socios con cuota (DNIs ficticios)

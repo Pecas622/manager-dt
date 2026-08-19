@@ -29,8 +29,20 @@ export type PlayerDocumentType = (typeof PLAYER_DOCUMENT_TYPES)[number]
 export const WEIGHT_UNIT = "kg"
 export const HEIGHT_UNIT = "cm"
 
-export const JUMP_TEST_TYPES = ["Salto vertical (CMJ)", "Salto horizontal", "Otro"] as const
+export const JUMP_TEST_TYPES = [
+  "Salto vertical (CMJ)",
+  "Salto horizontal",
+  "Squat Jump",
+  "Drop Jump",
+  "Otro",
+] as const
 export const JUMP_UNIT = "cm"
+export const JUMP_MS_UNIT = "ms"
+
+// Tests que se toman en varias repeticiones (cm + ms cada una, tipo
+// plataforma de salto) en vez de un solo valor — Squat Jump y Drop Jump,
+// tal cual llegan de la planilla del profe.
+export const REP_JUMP_TEST_TYPES = ["Squat Jump", "Drop Jump"] as const
 
 export const SPEED_TEST_TYPES = [
   "Velocidad 15m",

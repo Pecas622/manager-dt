@@ -21,6 +21,9 @@ delete from match_goals
 delete from routine_exercise_weeks
   where id between '17000000-0000-0000-0000-000000000000' and '17000000-0000-0000-0000-ffffffffffff';
 
+delete from physical_test_reps
+  where id between '13100000-0000-0000-0000-000000000000' and '13100000-0000-0000-0000-ffffffffffff';
+
 delete from physical_tests
   where id between '13000000-0000-0000-0000-000000000000' and '13000000-0000-0000-0000-ffffffffffff';
 

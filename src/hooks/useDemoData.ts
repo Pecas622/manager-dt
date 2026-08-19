@@ -14,6 +14,7 @@ import {
   DEMO_NATIONAL_PLAYER_COSTS,
   DEMO_PHYSICAL_EXERCISES,
   DEMO_PHYSICAL_TESTS,
+  DEMO_PHYSICAL_TEST_REPS,
   DEMO_PLAYERS,
   DEMO_PLAYER_EVALUATIONS,
   DEMO_PLAYER_REPORT_NOTES,
@@ -57,6 +58,7 @@ const SEED_STEPS: [table: string, rows: Record<string, unknown>[]][] = [
   ["national_player_costs", DEMO_NATIONAL_PLAYER_COSTS],
   ["national_payments", DEMO_NATIONAL_PAYMENTS],
   ["physical_tests", DEMO_PHYSICAL_TESTS],
+  ["physical_test_reps", DEMO_PHYSICAL_TEST_REPS],
   ["player_report_notes", DEMO_PLAYER_REPORT_NOTES],
 ]
 

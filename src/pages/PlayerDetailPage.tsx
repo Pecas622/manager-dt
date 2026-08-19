@@ -9,7 +9,12 @@ import { usePlayerEvaluations } from "@/hooks/useEvaluations"
 import { usePlayerTotalMinutes } from "@/hooks/useMatchSubstitutions"
 import { usePlayerCardCounts } from "@/hooks/useMatchCards"
 import { usePlayerGoalCount } from "@/hooks/useMatchGoals"
-import { useDeletePhysicalTest, usePlayerPhysicalTests } from "@/hooks/usePhysicalTests"
+import {
+  summarizeReps,
+  useDeletePhysicalTest,
+  usePlayerPhysicalTests,
+} from "@/hooks/usePhysicalTests"
+import { JUMP_MS_UNIT } from "@/types/domain"
 import { PhysicalTestFormDialog } from "@/components/physical-tests/PhysicalTestFormDialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -302,14 +307,25 @@ export function PlayerDetailPage() {
                       <p className="truncate font-medium">{test.test_name}</p>
                       <p className="text-sm text-muted-foreground">
                         {format(parseISO(test.date), "d MMM yyyy", { locale: es })}
+                        {test.reps && test.reps.length > 0 ? ` · ${test.reps.length} rep.` : ""}
                       </p>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-base font-semibold">
-                      {test.value}
-                      {test.unit ? ` ${test.unit}` : ""}
-                    </span>
+                    <div className="text-right">
+                      <p className="text-base font-semibold leading-tight">
+                        {test.value}
+                        {test.unit ? ` ${test.unit}` : ""}
+                      </p>
+                      {test.reps && test.reps.length > 0 && (() => {
+                        const { bestMs } = summarizeReps(test.reps)
+                        return bestMs != null ? (
+                          <p className="text-xs leading-tight text-muted-foreground">
+                            {bestMs.toFixed(0)} {JUMP_MS_UNIT}
+                          </p>
+                        ) : null
+                      })()}
+                    </div>
                     <Button
                       variant="ghost"
                       size="icon"
