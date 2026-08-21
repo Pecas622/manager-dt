@@ -10,7 +10,8 @@ import {
   useCreatePlayer,
   useUpdatePlayer,
 } from "@/hooks/usePlayers"
-import { POSITIONS, PREFERRED_FEET, PLAYER_STATUSES } from "@/types/domain"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
+import { CATEGORIES, POSITIONS, PREFERRED_FEET, PLAYER_STATUSES } from "@/types/domain"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -25,6 +26,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 
 const playerSchema = z.object({
+  category: z.enum(CATEGORIES, { message: "Seleccioná una categoría" }),
   first_name: z.string().min(1, "Requerido"),
   last_name: z.string().min(1, "Requerido"),
   photo_url: z.string().optional(),
@@ -44,6 +46,7 @@ const playerSchema = z.object({
 type PlayerFormValues = z.infer<typeof playerSchema>
 
 const emptyValues: PlayerFormValues = {
+  category: CATEGORIES[0],
   first_name: "",
   last_name: "",
   photo_url: "",
@@ -64,6 +67,7 @@ export function PlayerFormPage() {
   const { id } = useParams()
   const isEditing = Boolean(id)
   const navigate = useNavigate()
+  const { activeCategory } = useActiveCategory()
   const { data: player, isLoading } = usePlayer(id)
   const createPlayer = useCreatePlayer()
   const updatePlayer = useUpdatePlayer()
@@ -81,8 +85,15 @@ export function PlayerFormPage() {
   })
 
   useEffect(() => {
+    if (!isEditing) {
+      setValue("category", activeCategory)
+    }
+  }, [isEditing, activeCategory, setValue])
+
+  useEffect(() => {
     if (player) {
       reset({
+        category: player.category,
         first_name: player.first_name,
         last_name: player.last_name,
         photo_url: player.photo_url ?? "",
@@ -103,6 +114,7 @@ export function PlayerFormPage() {
 
   async function onSubmit(values: PlayerFormValues) {
     const payload = {
+      category: values.category,
       first_name: values.first_name,
       last_name: values.last_name,
       photo_url: values.photo_url || null,
@@ -163,6 +175,28 @@ export function PlayerFormPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <Card>
           <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label>Categoría</Label>
+              <Select
+                value={watch("category")}
+                onValueChange={(v) => v && setValue("category", v as PlayerFormValues["category"])}
+              >
+                <SelectTrigger className="h-12 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.category && (
+                <p className="text-xs text-destructive">{errors.category.message}</p>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="first_name">Nombre</Label>

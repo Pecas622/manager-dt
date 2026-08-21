@@ -6,15 +6,21 @@ import { z } from "zod"
 import { ArrowLeft, Database, Mail, Plus, Trash2, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
-import { useCreateProfile, useDeleteProfile, useProfiles } from "@/hooks/useProfiles"
-import { usePlayers } from "@/hooks/usePlayers"
+import {
+  useCreateProfile,
+  useDeleteProfile,
+  useProfiles,
+  useSetProfileCategories,
+} from "@/hooks/useProfiles"
+import { usePlayersAllCategories } from "@/hooks/usePlayers"
 import { useCleanupDemoData, useSeedDemoData } from "@/hooks/useDemoData"
 import { supabase } from "@/lib/supabaseClient"
-import { USER_ROLES, USER_ROLE_LABELS, type UserRole } from "@/types/domain"
+import { CATEGORIES, USER_ROLES, USER_ROLE_LABELS, type Category, type UserRole } from "@/types/domain"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select,
@@ -36,6 +42,7 @@ const linkSchema = z.object({
   full_name: z.string().optional(),
   role: z.enum(USER_ROLES, { message: "Seleccioná un rol" }),
   player_id: z.string().optional(),
+  categories: z.array(z.enum(CATEGORIES)),
 })
 
 type LinkFormValues = z.infer<typeof linkSchema>
@@ -45,17 +52,45 @@ const inviteSchema = z.object({
   full_name: z.string().optional(),
   role: z.enum(USER_ROLES, { message: "Seleccioná un rol" }),
   player_id: z.string().optional(),
+  categories: z.array(z.enum(CATEGORIES)),
 })
 
 type InviteFormValues = z.infer<typeof inviteSchema>
+
+function CategoryCheckboxes({
+  selected,
+  onToggle,
+}: {
+  selected: Category[]
+  onToggle: (category: Category) => void
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label>Categorías</Label>
+      <div className="flex flex-col gap-1 rounded-lg border border-input p-2">
+        {CATEGORIES.map((c) => (
+          <label key={c} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent/40">
+            <Checkbox checked={selected.includes(c)} onCheckedChange={() => onToggle(c)} />
+            {c}
+          </label>
+        ))}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        A qué categorías tiene acceso esta cuenta. El DT ve todas siempre, esto
+        solo aplica a Profesor.
+      </p>
+    </div>
+  )
+}
 
 export function UsersPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data: profiles, isLoading } = useProfiles()
-  const { data: players } = usePlayers()
+  const { data: players } = usePlayersAllCategories()
   const createProfile = useCreateProfile()
   const deleteProfile = useDeleteProfile()
+  const setProfileCategories = useSetProfileCategories()
   const seedDemoData = useSeedDemoData()
   const cleanupDemoData = useCleanupDemoData()
   const [open, setOpen] = useState(false)
@@ -71,10 +106,19 @@ export function UsersPage() {
     formState: { errors, isSubmitting },
   } = useForm<LinkFormValues>({
     resolver: zodResolver(linkSchema),
-    defaultValues: { id: "", full_name: "", role: "jugador", player_id: "" },
+    defaultValues: { id: "", full_name: "", role: "jugador", player_id: "", categories: [] },
   })
 
   const role = watch("role")
+  const linkCategories = watch("categories")
+
+  function toggleLinkCategory(category: Category) {
+    const current = watch("categories")
+    setValue(
+      "categories",
+      current.includes(category) ? current.filter((c) => c !== category) : [...current, category]
+    )
+  }
 
   const {
     register: registerInvite,
@@ -85,10 +129,18 @@ export function UsersPage() {
     formState: { errors: inviteErrors },
   } = useForm<InviteFormValues>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { email: "", full_name: "", role: "jugador", player_id: "" },
+    defaultValues: { email: "", full_name: "", role: "jugador", player_id: "", categories: [] },
   })
 
   const inviteRole = watchInvite("role")
+
+  function toggleInviteCategory(category: Category) {
+    const current = watchInvite("categories")
+    setInviteValue(
+      "categories",
+      current.includes(category) ? current.filter((c) => c !== category) : [...current, category]
+    )
+  }
 
   async function onSubmit(values: LinkFormValues) {
     try {
@@ -98,8 +150,14 @@ export function UsersPage() {
         role: values.role,
         player_id: values.role === "jugador" ? values.player_id || null : null,
       })
+      if (values.role === "profesor" && values.categories.length > 0) {
+        await setProfileCategories.mutateAsync({
+          profileId: values.id,
+          categories: values.categories,
+        })
+      }
       toast.success("Cuenta vinculada")
-      reset({ id: "", full_name: "", role: "jugador", player_id: "" })
+      reset({ id: "", full_name: "", role: "jugador", player_id: "", categories: [] })
       setOpen(false)
     } catch {
       toast.error("No se pudo vincular. Verificá que el UUID exista en Authentication → Users.")
@@ -123,6 +181,7 @@ export function UsersPage() {
           full_name: values.full_name || null,
           role: values.role,
           playerId: values.role === "jugador" ? values.player_id || null : null,
+          categories: values.role === "profesor" ? values.categories : [],
         }),
       })
       if (!res.ok) {
@@ -130,7 +189,7 @@ export function UsersPage() {
         throw new Error(body?.error ?? "No se pudo invitar")
       }
       toast.success("Invitación enviada")
-      resetInvite({ email: "", full_name: "", role: "jugador", player_id: "" })
+      resetInvite({ email: "", full_name: "", role: "jugador", player_id: "", categories: [] })
       setInviteOpen(false)
       // La función invite-user inserta el profile directo por service role,
       // sin pasar por useCreateProfile — hay que invalidar a mano.
@@ -223,6 +282,12 @@ export function UsersPage() {
                         : "Sin nombre")}
                   </p>
                   <Badge variant="outline">{USER_ROLE_LABELS[profile.role]}</Badge>
+                  {profile.role === "profesor" &&
+                    (profile.profile_categories ?? []).map(({ category }) => (
+                      <Badge key={category} variant="secondary">
+                        {category}
+                      </Badge>
+                    ))}
                 </div>
                 <p className="truncate font-mono text-xs text-muted-foreground">
                   {profile.id}
@@ -326,12 +391,16 @@ export function UsersPage() {
                   <SelectContent>
                     {players?.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
-                        {p.first_name} {p.last_name}
+                        {p.first_name} {p.last_name} · {p.category}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+            )}
+
+            {role === "profesor" && (
+              <CategoryCheckboxes selected={linkCategories} onToggle={toggleLinkCategory} />
             )}
 
             <DialogFooter>
@@ -399,12 +468,19 @@ export function UsersPage() {
                   <SelectContent>
                     {players?.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
-                        {p.first_name} {p.last_name}
+                        {p.first_name} {p.last_name} · {p.category}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+            )}
+
+            {inviteRole === "profesor" && (
+              <CategoryCheckboxes
+                selected={watchInvite("categories")}
+                onToggle={toggleInviteCategory}
+              />
             )}
 
             <DialogFooter>

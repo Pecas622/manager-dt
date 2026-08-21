@@ -1,6 +1,7 @@
 import type {
   BecadoStatus,
   CardType,
+  Category,
   ExerciseCategory,
   IndividualPlanFocusArea,
   IndividualPlanIntensity,
@@ -24,12 +25,14 @@ export interface Profile {
   full_name: string | null
   created_at: string
   player?: Player
+  profile_categories?: { category: Category }[]
 }
 
-export type ProfileInsert = Omit<Profile, "created_at" | "player">
+export type ProfileInsert = Omit<Profile, "created_at" | "player" | "profile_categories">
 
 export interface Player {
   id: string
+  category: Category
   first_name: string
   last_name: string
   photo_url: string | null
@@ -65,6 +68,7 @@ export type PlayerDocumentInsert = Omit<PlayerDocument, "id" | "created_at">
 
 export interface TrainingSession {
   id: string
+  category: Category
   date: string
   start_time: string
   duration: number
@@ -170,6 +174,9 @@ export type PhysicalExerciseUpdate = Partial<PhysicalExerciseInsert>
 // ejercicio). Mismo editor de ejercicios/grupos/circuitos para las dos.
 export interface Routine {
   id: string
+  // Solo para rutinas de plantilla (player_id null) — un Plan individual
+  // (player_id seteado) hereda la categoría de su jugador, queda null acá.
+  category: Category | null
   name: string
   notes: string | null
   created_by: string | null
@@ -256,6 +263,7 @@ export type RoutineExerciseWeekInsert = Omit<RoutineExerciseWeek, "id">
 
 export interface RoutineAssignment {
   id: string
+  category: Category
   routine_id: string
   date: string
   assigned_to: RoutineAssignmentTarget
@@ -273,6 +281,7 @@ export type RoutineAssignmentInsert = Omit<
 
 export interface Match {
   id: string
+  category: Category
   date: string
   start_time: string | null
   opponent: string
@@ -309,6 +318,7 @@ export type MatchUpdate = Partial<Omit<Match, "id" | "created_at" | "updated_at"
 
 export interface Tournament {
   id: string
+  category: Category
   name: string
   start_date: string | null
   end_date: string | null
@@ -424,6 +434,7 @@ export interface CheckBecadoResult {
 
 export interface National {
   id: string
+  category: Category
   name: string
   city: string | null
   start_date: string

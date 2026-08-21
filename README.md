@@ -1,10 +1,11 @@
 # C15 Manager
 
-Aplicación privada, mobile-first, para gestionar una categoría C15 de futsal:
-jugadores, calendario semanal (entrenamientos, rutinas físicas, partidos),
-biblioteca de ejercicios tácticos y rutinas físicas, check-ins físicos
-periódicos por jugador, y un módulo aparte para torneos "Nacionales"
-(cronograma, gastos y pagos por jugador).
+Aplicación privada, mobile-first, para gestionar las categorías de futsal
+de un club (C15, C17, C20, Primera): jugadores, calendario semanal
+(entrenamientos, rutinas físicas, partidos), biblioteca de ejercicios
+tácticos y rutinas físicas, check-ins físicos periódicos por jugador, y un
+módulo aparte para torneos "Nacionales" (cronograma, gastos y pagos por
+jugador).
 
 **V2** — suma roles (DT / Profesor / Jugador / Coordinador), Rutinas, Planes
 individuales por jugador, Torneos con sus Partidos (planilla de minutos por
@@ -14,9 +15,14 @@ físicos de salto y velocidad, Calendario central, Nacional (con minutos,
 goles, tarjetas y una observación libre por jugador, cargados a mano ahí
 mismo junto con los pagos), un control de acceso de becados para la
 seguridad del club, y un informe imprimible por jugador, sobre la V1
-original. Deliberadamente no incluye asistencias, tarjeta roja, fixture
-oficial, IA, video, WhatsApp, informes automáticos (programados/enviados
-solos) ni multi-club.
+original.
+
+**V3** — pasa a manejar varias categorías desde la misma app en vez de una
+sola implícita, ver "## Categorías" más abajo.
+
+Deliberadamente no incluye asistencias, tarjeta roja, fixture oficial, IA,
+video, WhatsApp, informes automáticos (programados/enviados solos) ni
+multi-club (son categorías del mismo club, no clubes distintos).
 
 ## Stack
 
@@ -62,6 +68,12 @@ React + TypeScript + Vite · Tailwind CSS + shadcn/ui · Supabase (Postgres + Au
    - `supabase/migrations/0027_individual_plans_as_routines.sql` (Planes individuales pasa a ser Rutinas con `player_id` — mismo editor de ejercicios/grupos/circuitos, progresión semanal por ejercicio en `routine_exercise_weeks` — **borra `individual_plans` y sus ejercicios**, hay que recargarlos como Planes)
    - `supabase/migrations/0028_national_profesor_calendar_access.sql` (el Profesor puede ver el Nacional y planificar el Calendario físico; Gastos/Jugadores siguen siendo DT-only)
    - `supabase/migrations/0029_physical_test_reps.sql` (repeticiones cm+ms por test de salto — Squat Jump, Drop Jump —, con mayor valor y promedio calculados solos)
+   - `supabase/migrations/0030_position_poste_ala.sql` (agrega "Poste-ala" como posición)
+   - `supabase/migrations/0031_categories_foundation.sql` (Fase A de multi-categoría: `players.category`, `profile_categories`, `auth_categories()` — ver "## Categorías". Backfillea todo lo existente a C15)
+   - `supabase/migrations/0032_categories_calendar.sql` (Fase B: `training_sessions`/`matches`/`tournaments` por categoría, backfillea a C15)
+   - `supabase/migrations/0033_categories_routines.sql` (Fase C: `routines` — categoría obligatoria en plantillas, heredada del jugador en Planes — y `routine_assignments` por categoría, backfillea a C15)
+   - `supabase/migrations/0034_categories_nationals.sql` (Fase D: `nationals` por categoría, backfillea a C15)
+   - `supabase/migrations/0035_categories_evaluations_tests.sql` (Fase E: Tests físicos por categoría del jugador — Evaluaciones sigue 100% DT-only, sin cambios de acceso)
 
 4. Crear las cuentas en **Authentication → Users** (email + contraseña):
    - Tu propia cuenta de **DT**.
@@ -221,12 +233,56 @@ o simplemente probarlo contra el deploy de Vercel directamente.
   partidos de la semana actual, con el detalle al tocar cada actividad (series,
   repeticiones, descansos, video, imagen, indicaciones). Sin evaluaciones, sin
   botón de confirmar cumplimiento de rutina (se descartó a propósito).
-- **Coordinador**: rol de club, no de la categoría C15 — no ve entrenamientos,
-  evaluaciones ni nada deportivo. Solo administra la lista de **Ingreso**
-  (becados y socios con cuota: nombre + DNI + tipo + estado), para que
-  seguridad los deje entrar. Pensado para cuando esta tarea la lleve alguien
-  que no debería ver el resto de la app; si preferís, el DT puede hacerlo
-  todo desde su propia cuenta sin crear un Coordinador aparte.
+- **Coordinador**: rol de club, no de una categoría puntual — no ve
+  entrenamientos, evaluaciones ni nada deportivo (de ninguna categoría).
+  Solo administra la lista de **Ingreso** (becados y socios con cuota:
+  nombre + DNI + tipo + estado), para que seguridad los deje entrar.
+  Pensado para cuando esta tarea la lleve alguien que no debería ver el
+  resto de la app; si preferís, el DT puede hacerlo todo desde su propia
+  cuenta sin crear un Coordinador aparte.
+
+## Categorías
+
+El club maneja varias categorías (**C15, C17, C20, Primera**) desde la
+misma app, cada una scopeada como si fuera su propio equipo — jugadores,
+entrenamientos, partidos, torneos, rutinas/planes, Nacional y tests
+físicos quedan todos separados por categoría. No hay una tabla
+`categories` ni pantalla para administrarlas — son 4 valores fijos (mismo
+patrón que `position` en la ficha del jugador). Excepciones deliberadas:
+
+- La **biblioteca de ejercicios** (`training_exercises` táctica,
+  `physical_exercises` física) es **compartida** entre categorías — un
+  ejercicio es el mismo objeto sin importar quién lo entrena; lo que varía
+  por categoría es cuándo y a quién se le asigna (entrenamientos, rutinas).
+- **Becados/Ingreso** no tiene categoría — es una lista de acceso del
+  club, sin relación con jugadores.
+- **Evaluaciones** sigue siendo 100% DT-only como ya era — solo se le sumó
+  el filtro de categoría activa a la lista, sin cambiar quién tiene acceso.
+- Un jugador pertenece a **una sola** categoría (no hay "jugadores
+  subidos" a otra categoría en esta versión).
+
+**Selector de categoría activa**: un dropdown fijo (sidebar en desktop,
+header en mobile) — cambia toda la app a esa categoría, se acuerda entre
+sesiones (`localStorage`). Solo aparece si la cuenta tiene acceso a más de
+una categoría.
+
+**Acceso por categoría**:
+- **DT**: ve y administra las 4 sin restricción, siempre — no necesita
+  estar vinculado a ninguna categoría en particular.
+- **Profesor**: puede quedar limitado a una o más categorías específicas —
+  se elige al vincular la cuenta (en **Usuarios**, tanto "Invitar por
+  email" como "Vincular por UUID" piden qué categorías, solo si el rol es
+  Profesor). Se guarda en `profile_categories`.
+- **Jugador**: ve solo la categoría de su propio jugador — sale
+  automático de a qué jugador está vinculada la cuenta, no hace falta
+  configurar nada aparte.
+- **Coordinador**: no le aplica — no toca datos de ninguna categoría (ver
+  Roles arriba).
+
+Todo lo cargado antes de este pase (17+ jugadores reales, entrenamientos,
+partidos, rutinas, evaluaciones, tests, el Nacional 2026) quedó
+backfilleado a **C15** al correr las migraciones `0031` a `0035` — es el
+plantel e historial que ya venían manejando bajo "C15 Manager".
 
 ## Control de acceso (Becados y Cuota)
 

@@ -12,6 +12,7 @@ import {
   useTrainingSession,
   useUpdateTrainingSession,
 } from "@/hooks/useTrainingSessions"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import { DEFAULT_TRAINING_DURATION, DEFAULT_TRAINING_START_TIME } from "@/types/domain"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,6 +36,7 @@ export function TrainingFormPage() {
   const [searchParams] = useSearchParams()
   const isEditing = Boolean(id)
   const navigate = useNavigate()
+  const { activeCategory } = useActiveCategory()
   const { data: session, isLoading } = useTrainingSession(id)
   const createSession = useCreateTrainingSession()
   const updateSession = useUpdateTrainingSession()
@@ -77,6 +79,7 @@ export function TrainingFormPage() {
 
   async function onSubmit(values: SessionFormValues) {
     const payload = {
+      category: session?.category ?? activeCategory,
       date: values.date,
       start_time: values.start_time,
       duration: Number(values.duration),

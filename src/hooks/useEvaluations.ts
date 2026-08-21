@@ -1,16 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import type { PlayerEvaluation, PlayerEvaluationInsert } from "@/types/database"
 
 const EVALUATIONS_KEY = ["evaluations"] as const
 
 export function useEvaluations(options?: { enabled?: boolean }) {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: EVALUATIONS_KEY,
+    queryKey: [...EVALUATIONS_KEY, activeCategory],
     queryFn: async () => {
+      // player_evaluations sigue siendo 100% DT-only por RLS — el filtro acá
+      // es solo para que el DT vea una categoría a la vez, no un permiso.
       const { data, error } = await supabase
         .from("player_evaluations")
-        .select("*, player:players(*)")
+        .select("*, player:players!inner(*)")
+        .eq("player.category", activeCategory)
         .order("date", { ascending: false })
       if (error) throw error
       return data as PlayerEvaluation[]

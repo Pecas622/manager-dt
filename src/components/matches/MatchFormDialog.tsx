@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import { useCreateMatch, useDeleteMatch, useUpdateMatch } from "@/hooks/useMatches"
 import type { Match } from "@/types/database"
 import { Button } from "@/components/ui/button"
@@ -45,6 +46,7 @@ export function MatchFormDialog({
   tournamentId?: string
 }) {
   const { role } = useAuth()
+  const { activeCategory } = useActiveCategory()
   const createMatch = useCreateMatch()
   const updateMatch = useUpdateMatch()
   const deleteMatch = useDeleteMatch()
@@ -95,6 +97,7 @@ export function MatchFormDialog({
 
   async function onSubmit(values: MatchFormValues) {
     const payload = {
+      category: match?.category ?? activeCategory,
       date: values.date,
       start_time: values.start_time || null,
       opponent: values.opponent,

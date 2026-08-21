@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import type {
   National,
   NationalActivity,
@@ -19,12 +20,14 @@ import type {
 const NATIONALS_KEY = ["nationals"] as const
 
 export function useNationals() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: NATIONALS_KEY,
+    queryKey: [...NATIONALS_KEY, activeCategory],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("nationals")
         .select("*")
+        .eq("category", activeCategory)
         .order("start_date", { ascending: false })
       if (error) throw error
       return data as National[]

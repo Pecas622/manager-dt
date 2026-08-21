@@ -1,13 +1,32 @@
 import { useEffect, useState } from "react"
 import type { Session } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabaseClient"
-import type { UserRole } from "@/types/domain"
+import type { Category, UserRole } from "@/types/domain"
 
 interface AuthState {
   session: Session | null
   loading: boolean
   role: UserRole | null
   playerId: string | null
+  categories: Category[]
+}
+
+// Categorías visibles para el perfil: Jugador la resuelve vía su propio
+// jugador vinculado (siempre una sola); el resto sale de
+// `profile_categories`. El DT no necesita nada acá — ve todas por su rol
+// (ver `useActiveCategory`).
+async function loadCategories(role: UserRole, playerId: string | null): Promise<Category[]> {
+  if (role === "jugador") {
+    if (!playerId) return []
+    const { data } = await supabase
+      .from("players")
+      .select("category")
+      .eq("id", playerId)
+      .maybeSingle()
+    return data?.category ? [data.category as Category] : []
+  }
+  const { data } = await supabase.from("profile_categories").select("category")
+  return (data ?? []).map((row) => row.category as Category)
 }
 
 async function loadProfile(userId: string) {
@@ -16,7 +35,9 @@ async function loadProfile(userId: string) {
     .select("role, player_id")
     .eq("id", userId)
     .maybeSingle()
-  return data
+  if (!data) return null
+  const categories = await loadCategories(data.role as UserRole, data.player_id)
+  return { ...data, categories }
 }
 
 export function useAuth() {
@@ -25,6 +46,7 @@ export function useAuth() {
     loading: true,
     role: null,
     playerId: null,
+    categories: [],
   })
 
   useEffect(() => {
@@ -40,6 +62,7 @@ export function useAuth() {
         loading: false,
         role: (profile?.role as UserRole | undefined) ?? null,
         playerId: profile?.player_id ?? null,
+        categories: profile?.categories ?? [],
       })
     }
 
@@ -54,6 +77,7 @@ export function useAuth() {
           loading: false,
           role: (profile?.role as UserRole | undefined) ?? null,
           playerId: profile?.player_id ?? null,
+          categories: profile?.categories ?? [],
         })
       }
     )
@@ -70,5 +94,6 @@ export function useAuth() {
     isAuthenticated: Boolean(state.session),
     role: state.role,
     playerId: state.playerId,
+    categories: state.categories,
   }
 }

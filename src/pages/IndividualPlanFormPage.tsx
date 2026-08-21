@@ -95,6 +95,7 @@ export function IndividualPlanFormPage() {
 
   async function onSubmit(values: PlanFormValues) {
     const payload = {
+      category: null,
       player_id: values.player_id,
       name: values.name,
       objective: values.objective || null,

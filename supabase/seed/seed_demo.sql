@@ -9,30 +9,30 @@
 -- =========================================================
 -- players (18) — prefijo 10000000-0000-0000-0000-0000000000xx
 -- =========================================================
-insert into players (id, first_name, last_name, photo_url, birth_date, jersey_number, position, preferred_foot, join_date, status, weight_kg, height_cm, strengths, weaknesses, notes) values
-('10000000-0000-0000-0000-000000000001', 'Juan', 'Pérez', null, '2011-03-14', 10, 'Ala', 'Derecha', '2024-02-01', 'Activo', 63.8, 168, 'Buen 1 vs 1, velocidad y buena intensidad defensiva.', 'Mejorar toma de decisiones bajo presión.', 'Capitán del equipo.'),
-('10000000-0000-0000-0000-000000000002', 'Mateo', 'Gómez', null, '2011-06-02', 7, 'Pivot', 'Izquierda', '2024-02-01', 'Activo', null, null, 'Buen juego de espaldas y protección de pelota.', 'Definición con la pierna izquierda.', null),
-('10000000-0000-0000-0000-000000000003', 'Benjamín', 'Fernández', null, '2011-01-22', 1, 'Arquero', 'Derecha', '2024-02-01', 'Activo', 65, 172, 'Buenos reflejos y salida de pelota jugando con los pies.', 'Colocación en tiros de media distancia.', null),
-('10000000-0000-0000-0000-000000000004', 'Santino', 'Rodríguez', null, '2011-09-10', 4, 'Cierre', 'Derecha', '2024-08-15', 'Activo', 58, 165, 'Buena lectura defensiva y marca.', 'Salida jugando bajo presión.', null),
-('10000000-0000-0000-0000-000000000005', 'Thiago', 'Martínez', null, '2011-04-18', 8, 'Ala', 'Izquierda', '2024-02-01', 'Activo', 60.2, 170, 'Desequilibrante en el 1 vs 1, buen remate de media distancia.', 'Trabajo defensivo tras pérdida.', null),
-('10000000-0000-0000-0000-000000000006', 'Valentino', 'López', null, '2011-11-05', 5, 'Universal', 'Derecha', '2025-02-03', 'Activo', null, null, 'Versátil, entiende bien los sistemas de juego.', 'Consistencia en los pases largos.', null),
-('10000000-0000-0000-0000-000000000007', 'Lautaro', 'Díaz', null, '2011-07-29', 12, 'Pivot', 'Derecha', '2025-02-03', 'Activo', null, null, 'Fuerza y buen juego aéreo.', 'Movilidad sin la pelota.', null),
-('10000000-0000-0000-0000-000000000008', 'Bautista', 'Sánchez', null, '2011-02-14', 2, 'Cierre', 'Izquierda', '2024-02-01', 'Activo', null, null, 'Anticipación y buena salida con la pelota dominada.', 'Duelos individuales cuerpo a cuerpo.', null),
-('10000000-0000-0000-0000-000000000009', 'Joaquín', 'Romero', null, '2011-05-20', 11, 'Ala', 'Derecha', '2025-08-01', 'Activo', null, null, 'Buena pierna derecha, remata bien de media distancia.', 'Intensidad en la marca.', 'Incorporación reciente.'),
-('10000000-0000-0000-0000-00000000000a', 'Ignacio', 'Torres', null, '2011-10-08', 3, 'Cierre', 'Derecha', '2024-02-01', 'Activo', null, null, 'Buen líder defensivo, marca fuerte.', 'Tranquilidad con la pelota dominada.', null),
-('10000000-0000-0000-0000-00000000000b', 'Facundo', 'Álvarez', null, '2011-03-30', 9, 'Universal', 'Izquierda', '2025-02-03', 'Activo', null, null, 'Polivalente, buen manejo de ambas piernas.', 'Toma de decisión en el último tercio.', null),
-('10000000-0000-0000-0000-00000000000c', 'Agustín', 'Ramírez', null, '2011-08-16', 13, 'Arquero', 'Derecha', '2025-02-03', 'Activo', null, null, 'Bueno debajo de los tres palos, buenos reflejos.', 'Juego con los pies.', null),
-('10000000-0000-0000-0000-00000000000d', 'Franco', 'Flores', null, '2011-12-01', 6, 'Ala', 'Derecha', '2024-02-01', 'Activo', null, null, 'Buena progresión con la pelota dominada.', 'Definición de gol.', null),
-('10000000-0000-0000-0000-00000000000e', 'Dante', 'Acosta', null, '2011-01-09', 14, 'Pivot', 'Izquierda', '2025-08-01', 'Activo', null, null, 'Buen socio de juego, da profundidad.', 'Juego aéreo.', null),
-('10000000-0000-0000-0000-00000000000f', 'Ciro', 'Benítez', null, '2011-06-25', 15, 'Universal', 'Derecha', '2024-08-15', 'Activo', null, null, 'Buen recorrido de cancha, gran esfuerzo.', 'Precisión en el último pase.', null),
-('10000000-0000-0000-0000-000000000010', 'Simón', 'Molina', null, '2011-04-03', 16, 'Ala', 'Izquierda', '2025-02-03', 'Activo', null, null, 'Encarador, buena gambeta corta.', 'Ida y vuelta en transición.', null),
-('10000000-0000-0000-0000-000000000011', 'Máximo', 'Castro', null, '2011-09-27', 17, 'Cierre', 'Derecha', '2025-08-01', 'Inactivo', null, null, 'Fuerte en el mano a mano.', 'Salida jugando desde el fondo.', 'Lesionado, en recuperación.'),
-('10000000-0000-0000-0000-000000000012', 'Julián', 'Ortiz', null, '2011-11-19', 18, 'Arquero', 'Izquierda', '2025-08-01', 'Activo', null, null, 'Buena estatura y cobertura del arco.', 'Comunicación con la defensa.', 'Suplente, en desarrollo.')
+insert into players (id, category, first_name, last_name, photo_url, birth_date, jersey_number, position, preferred_foot, join_date, status, weight_kg, height_cm, strengths, weaknesses, notes) values
+('10000000-0000-0000-0000-000000000001', 'C15', 'Juan', 'Pérez', null, '2011-03-14', 10, 'Ala', 'Derecha', '2024-02-01', 'Activo', 63.8, 168, 'Buen 1 vs 1, velocidad y buena intensidad defensiva.', 'Mejorar toma de decisiones bajo presión.', 'Capitán del equipo.'),
+('10000000-0000-0000-0000-000000000002', 'C15', 'Mateo', 'Gómez', null, '2011-06-02', 7, 'Pivot', 'Izquierda', '2024-02-01', 'Activo', null, null, 'Buen juego de espaldas y protección de pelota.', 'Definición con la pierna izquierda.', null),
+('10000000-0000-0000-0000-000000000003', 'C15', 'Benjamín', 'Fernández', null, '2011-01-22', 1, 'Arquero', 'Derecha', '2024-02-01', 'Activo', 65, 172, 'Buenos reflejos y salida de pelota jugando con los pies.', 'Colocación en tiros de media distancia.', null),
+('10000000-0000-0000-0000-000000000004', 'C15', 'Santino', 'Rodríguez', null, '2011-09-10', 4, 'Cierre', 'Derecha', '2024-08-15', 'Activo', 58, 165, 'Buena lectura defensiva y marca.', 'Salida jugando bajo presión.', null),
+('10000000-0000-0000-0000-000000000005', 'C15', 'Thiago', 'Martínez', null, '2011-04-18', 8, 'Ala', 'Izquierda', '2024-02-01', 'Activo', 60.2, 170, 'Desequilibrante en el 1 vs 1, buen remate de media distancia.', 'Trabajo defensivo tras pérdida.', null),
+('10000000-0000-0000-0000-000000000006', 'C15', 'Valentino', 'López', null, '2011-11-05', 5, 'Universal', 'Derecha', '2025-02-03', 'Activo', null, null, 'Versátil, entiende bien los sistemas de juego.', 'Consistencia en los pases largos.', null),
+('10000000-0000-0000-0000-000000000007', 'C15', 'Lautaro', 'Díaz', null, '2011-07-29', 12, 'Pivot', 'Derecha', '2025-02-03', 'Activo', null, null, 'Fuerza y buen juego aéreo.', 'Movilidad sin la pelota.', null),
+('10000000-0000-0000-0000-000000000008', 'C15', 'Bautista', 'Sánchez', null, '2011-02-14', 2, 'Cierre', 'Izquierda', '2024-02-01', 'Activo', null, null, 'Anticipación y buena salida con la pelota dominada.', 'Duelos individuales cuerpo a cuerpo.', null),
+('10000000-0000-0000-0000-000000000009', 'C15', 'Joaquín', 'Romero', null, '2011-05-20', 11, 'Ala', 'Derecha', '2025-08-01', 'Activo', null, null, 'Buena pierna derecha, remata bien de media distancia.', 'Intensidad en la marca.', 'Incorporación reciente.'),
+('10000000-0000-0000-0000-00000000000a', 'C15', 'Ignacio', 'Torres', null, '2011-10-08', 3, 'Cierre', 'Derecha', '2024-02-01', 'Activo', null, null, 'Buen líder defensivo, marca fuerte.', 'Tranquilidad con la pelota dominada.', null),
+('10000000-0000-0000-0000-00000000000b', 'C15', 'Facundo', 'Álvarez', null, '2011-03-30', 9, 'Universal', 'Izquierda', '2025-02-03', 'Activo', null, null, 'Polivalente, buen manejo de ambas piernas.', 'Toma de decisión en el último tercio.', null),
+('10000000-0000-0000-0000-00000000000c', 'C15', 'Agustín', 'Ramírez', null, '2011-08-16', 13, 'Arquero', 'Derecha', '2025-02-03', 'Activo', null, null, 'Bueno debajo de los tres palos, buenos reflejos.', 'Juego con los pies.', null),
+('10000000-0000-0000-0000-00000000000d', 'C15', 'Franco', 'Flores', null, '2011-12-01', 6, 'Ala', 'Derecha', '2024-02-01', 'Activo', null, null, 'Buena progresión con la pelota dominada.', 'Definición de gol.', null),
+('10000000-0000-0000-0000-00000000000e', 'C15', 'Dante', 'Acosta', null, '2011-01-09', 14, 'Pivot', 'Izquierda', '2025-08-01', 'Activo', null, null, 'Buen socio de juego, da profundidad.', 'Juego aéreo.', null),
+('10000000-0000-0000-0000-00000000000f', 'C15', 'Ciro', 'Benítez', null, '2011-06-25', 15, 'Universal', 'Derecha', '2024-08-15', 'Activo', null, null, 'Buen recorrido de cancha, gran esfuerzo.', 'Precisión en el último pase.', null),
+('10000000-0000-0000-0000-000000000010', 'C15', 'Simón', 'Molina', null, '2011-04-03', 16, 'Ala', 'Izquierda', '2025-02-03', 'Activo', null, null, 'Encarador, buena gambeta corta.', 'Ida y vuelta en transición.', null),
+('10000000-0000-0000-0000-000000000011', 'C15', 'Máximo', 'Castro', null, '2011-09-27', 17, 'Cierre', 'Derecha', '2025-08-01', 'Inactivo', null, null, 'Fuerte en el mano a mano.', 'Salida jugando desde el fondo.', 'Lesionado, en recuperación.'),
+('10000000-0000-0000-0000-000000000012', 'C15', 'Julián', 'Ortiz', null, '2011-11-19', 18, 'Arquero', 'Izquierda', '2025-08-01', 'Activo', null, null, 'Buena estatura y cobertura del arco.', 'Comunicación con la defensa.', 'Suplente, en desarrollo.')
 on conflict (id) do update set
-  first_name = excluded.first_name, last_name = excluded.last_name, photo_url = excluded.photo_url,
-  birth_date = excluded.birth_date, jersey_number = excluded.jersey_number, position = excluded.position,
-  preferred_foot = excluded.preferred_foot, join_date = excluded.join_date, status = excluded.status,
-  weight_kg = excluded.weight_kg, height_cm = excluded.height_cm,
+  category = excluded.category, first_name = excluded.first_name, last_name = excluded.last_name,
+  photo_url = excluded.photo_url, birth_date = excluded.birth_date, jersey_number = excluded.jersey_number,
+  position = excluded.position, preferred_foot = excluded.preferred_foot, join_date = excluded.join_date,
+  status = excluded.status, weight_kg = excluded.weight_kg, height_cm = excluded.height_cm,
   strengths = excluded.strengths, weaknesses = excluded.weaknesses, notes = excluded.notes;
 
 -- =========================================================
@@ -60,18 +60,18 @@ on conflict (id) do update set
 -- =========================================================
 -- training_sessions (3) — prefijo 30000000-0000-0000-0000-0000000000xx
 -- =========================================================
-insert into training_sessions (id, date, start_time, duration, main_objective, secondary_objectives, notes, observations, focus_areas) values
-('30000000-0000-0000-0000-000000000001', '2026-08-03', '18:00', 75, 'Conservación y transición ofensiva.', 'Trabajar la salida corta y la presión tras pérdida.', 'Cancha techada, primer entrenamiento de la semana.',
+insert into training_sessions (id, category, date, start_time, duration, main_objective, secondary_objectives, notes, observations, focus_areas) values
+('30000000-0000-0000-0000-000000000001', 'C15', '2026-08-03', '18:00', 75, 'Conservación y transición ofensiva.', 'Trabajar la salida corta y la presión tras pérdida.', 'Cancha techada, primer entrenamiento de la semana.',
  'El equipo mostró buena intensidad en el rondo. En el 3v2 costó mantener el orden en la transición defensiva las primeras series, mejoró hacia el final.',
  'Reforzar la cobertura del segundo defensor en la transición defensiva.'),
-('30000000-0000-0000-0000-000000000002', '2026-08-05', '18:00', 75, 'Circulación de pelota y definición.', 'Mejorar la puntería en situaciones de finalización.', null,
+('30000000-0000-0000-0000-000000000002', 'C15', '2026-08-05', '18:00', 75, 'Circulación de pelota y definición.', 'Mejorar la puntería en situaciones de finalización.', null,
  'Buena circulación en el rondo 5v2. En finalización faltó precisión con la pierna izquierda en varios jugadores.',
  'Sumar trabajo específico de definición con pierna izquierda en la próxima semana.'),
-('30000000-0000-0000-0000-000000000003', '2026-08-07', '18:00', 75, 'Salida de presión y juego reducido.', 'Sostener la intensidad en los últimos minutos.', null,
+('30000000-0000-0000-0000-000000000003', 'C15', '2026-08-07', '18:00', 75, 'Salida de presión y juego reducido.', 'Sostener la intensidad en los últimos minutos.', null,
  'Muy buena salida de presión ante el bloque alto simulado. El partido condicionado mostró cansancio acumulado en el último tramo.',
  'Trabajar resistencia específica para sostener la intensidad los 75 minutos.')
 on conflict (id) do update set
-  date = excluded.date, start_time = excluded.start_time, duration = excluded.duration, main_objective = excluded.main_objective,
+  category = excluded.category, date = excluded.date, start_time = excluded.start_time, duration = excluded.duration, main_objective = excluded.main_objective,
   secondary_objectives = excluded.secondary_objectives, notes = excluded.notes, observations = excluded.observations, focus_areas = excluded.focus_areas;
 
 -- =========================================================
@@ -149,13 +149,13 @@ on conflict (id) do update set
 -- Torres), privada de él, con metadata de plan. Requiere haber corrido
 -- 0027_individual_plans_as_routines.sql.
 -- =========================================================
-insert into routines (id, name, notes, created_by, player_id, objective, plan_type, focus_area, intensity, start_date, duration_weeks, session_duration_minutes, status) values
-('80000000-0000-0000-0000-000000000001', 'Fuerza de piernas', 'Rutina de fuerza general, dos veces por semana.', null, null, null, null, null, null, null, null, null, 'Activa'),
-('80000000-0000-0000-0000-000000000002', 'Activación pre-partido', 'Rutina corta de activación para el día previo al partido.', null, null, null, null, null, null, null, null, null, 'Activa'),
-('80000000-0000-0000-0000-000000000003', 'Rutina de grupos — Semanas 1 y 2 (Día MD-4)', 'Split por grupo físico, formato circuito.', null, null, null, null, null, null, null, null, null, 'Activa'),
-('80000000-0000-0000-0000-000000000004', 'Fuerza de piernas post-esguince', null, null, '10000000-0000-0000-0000-00000000000a', 'Recuperar fuerza y estabilidad de tobillo tras esguince leve.', 'Rehabilitación', 'Tren inferior', 'Media', '2026-07-01', 4, 30, 'Activa')
+insert into routines (id, category, name, notes, created_by, player_id, objective, plan_type, focus_area, intensity, start_date, duration_weeks, session_duration_minutes, status) values
+('80000000-0000-0000-0000-000000000001', 'C15', 'Fuerza de piernas', 'Rutina de fuerza general, dos veces por semana.', null, null, null, null, null, null, null, null, null, 'Activa'),
+('80000000-0000-0000-0000-000000000002', 'C15', 'Activación pre-partido', 'Rutina corta de activación para el día previo al partido.', null, null, null, null, null, null, null, null, null, 'Activa'),
+('80000000-0000-0000-0000-000000000003', 'C15', 'Rutina de grupos — Semanas 1 y 2 (Día MD-4)', 'Split por grupo físico, formato circuito.', null, null, null, null, null, null, null, null, null, 'Activa'),
+('80000000-0000-0000-0000-000000000004', null, 'Fuerza de piernas post-esguince', null, null, '10000000-0000-0000-0000-00000000000a', 'Recuperar fuerza y estabilidad de tobillo tras esguince leve.', 'Rehabilitación', 'Tren inferior', 'Media', '2026-07-01', 4, 30, 'Activa')
 on conflict (id) do update set
-  name = excluded.name, notes = excluded.notes, player_id = excluded.player_id, objective = excluded.objective,
+  category = excluded.category, name = excluded.name, notes = excluded.notes, player_id = excluded.player_id, objective = excluded.objective,
   plan_type = excluded.plan_type, focus_area = excluded.focus_area, intensity = excluded.intensity,
   start_date = excluded.start_date, duration_weeks = excluded.duration_weeks,
   session_duration_minutes = excluded.session_duration_minutes, status = excluded.status;
@@ -227,28 +227,28 @@ on conflict (id) do update set
 -- =========================================================
 -- routine_assignments — prefijo a0000000-0000-0000-0000-0000000000xx
 -- =========================================================
-insert into routine_assignments (id, routine_id, date, assigned_to, created_by, notes) values
-('a0000000-0000-0000-0000-000000000001', '80000000-0000-0000-0000-000000000001', '2026-08-11', 'categoria', null, null),
-('a0000000-0000-0000-0000-000000000002', '80000000-0000-0000-0000-000000000002', '2026-08-14', 'categoria', null, null)
+insert into routine_assignments (id, category, routine_id, date, assigned_to, created_by, notes) values
+('a0000000-0000-0000-0000-000000000001', 'C15', '80000000-0000-0000-0000-000000000001', '2026-08-11', 'categoria', null, null),
+('a0000000-0000-0000-0000-000000000002', 'C15', '80000000-0000-0000-0000-000000000002', '2026-08-14', 'categoria', null, null)
 on conflict (id) do update set
-  routine_id = excluded.routine_id, date = excluded.date, assigned_to = excluded.assigned_to, notes = excluded.notes;
+  category = excluded.category, routine_id = excluded.routine_id, date = excluded.date, assigned_to = excluded.assigned_to, notes = excluded.notes;
 
 -- =========================================================
 -- tournaments (1) — prefijo 1a000000-0000-0000-0000-0000000000xx
 -- =========================================================
-insert into tournaments (id, name, start_date, end_date, notes) values
-('1a000000-0000-0000-0000-000000000001', 'Apertura 2026', '2026-03-01', '2026-09-30', 'Torneo local regular de la categoría.')
+insert into tournaments (id, category, name, start_date, end_date, notes) values
+('1a000000-0000-0000-0000-000000000001', 'C15', 'Apertura 2026', '2026-03-01', '2026-09-30', 'Torneo local regular de la categoría.')
 on conflict (id) do update set
-  name = excluded.name, start_date = excluded.start_date, end_date = excluded.end_date, notes = excluded.notes;
+  category = excluded.category, name = excluded.name, start_date = excluded.start_date, end_date = excluded.end_date, notes = excluded.notes;
 
 -- =========================================================
 -- matches (2) — prefijo c0000000-0000-0000-0000-0000000000xx
 -- =========================================================
-insert into matches (id, date, start_time, opponent, location, is_home, national_id, tournament_id, notes) values
-('c0000000-0000-0000-0000-000000000001', '2026-08-15', '15:00', 'Andes', 'Cancha Regatas', true, null, '1a000000-0000-0000-0000-000000000001', null),
-('c0000000-0000-0000-0000-000000000002', '2026-10-06', '15:00', 'Sportivo Norte', 'Córdoba', false, 'd0000000-0000-0000-0000-000000000001', null, 'Partido de fase de grupos del Nacional.')
+insert into matches (id, category, date, start_time, opponent, location, is_home, national_id, tournament_id, notes) values
+('c0000000-0000-0000-0000-000000000001', 'C15', '2026-08-15', '15:00', 'Andes', 'Cancha Regatas', true, null, '1a000000-0000-0000-0000-000000000001', null),
+('c0000000-0000-0000-0000-000000000002', 'C15', '2026-10-06', '15:00', 'Sportivo Norte', 'Córdoba', false, 'd0000000-0000-0000-0000-000000000001', null, 'Partido de fase de grupos del Nacional.')
 on conflict (id) do update set
-  date = excluded.date, start_time = excluded.start_time, opponent = excluded.opponent,
+  category = excluded.category, date = excluded.date, start_time = excluded.start_time, opponent = excluded.opponent,
   location = excluded.location, is_home = excluded.is_home, national_id = excluded.national_id,
   tournament_id = excluded.tournament_id, notes = excluded.notes;
 
@@ -310,10 +310,10 @@ on conflict (id) do update set
 -- =========================================================
 -- nationals (1) — prefijo d0000000-0000-0000-0000-0000000000xx
 -- =========================================================
-insert into nationals (id, name, city, start_date, end_date, travel_date, return_date, info, default_flight_cost, default_lodging_cost, default_food_cost, default_transport_cost) values
-('d0000000-0000-0000-0000-000000000001', 'Nacional 2026', 'Córdoba', '2026-10-05', '2026-10-10', '2026-10-04', '2026-10-11', 'Torneo nacional de la categoría, fase de grupos + playoffs.', 150000, 120000, 40000, 20000)
+insert into nationals (id, category, name, city, start_date, end_date, travel_date, return_date, info, default_flight_cost, default_lodging_cost, default_food_cost, default_transport_cost) values
+('d0000000-0000-0000-0000-000000000001', 'C15', 'Nacional 2026', 'Córdoba', '2026-10-05', '2026-10-10', '2026-10-04', '2026-10-11', 'Torneo nacional de la categoría, fase de grupos + playoffs.', 150000, 120000, 40000, 20000)
 on conflict (id) do update set
-  name = excluded.name, city = excluded.city, start_date = excluded.start_date, end_date = excluded.end_date,
+  category = excluded.category, name = excluded.name, city = excluded.city, start_date = excluded.start_date, end_date = excluded.end_date,
   travel_date = excluded.travel_date, return_date = excluded.return_date, info = excluded.info,
   default_flight_cost = excluded.default_flight_cost, default_lodging_cost = excluded.default_lodging_cost,
   default_food_cost = excluded.default_food_cost, default_transport_cost = excluded.default_transport_cost;

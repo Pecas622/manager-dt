@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js"
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 
 const VALID_ROLES = ["dt", "profesor", "jugador", "coordinador"]
+const VALID_CATEGORIES = ["C15", "C17", "C20", "Primera"]
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -43,14 +44,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // 2. Validar body.
-  const { email, role, fullName, playerId } = (req.body ?? {}) as {
+  const { email, role, fullName, playerId, categories } = (req.body ?? {}) as {
     email?: string
     role?: string
     fullName?: string
     playerId?: string
+    categories?: string[]
   }
   if (!email || !role) return res.status(400).json({ error: "Falta email o rol" })
   if (!VALID_ROLES.includes(role)) return res.status(400).json({ error: "Rol inválido" })
+  const cleanCategories = (categories ?? []).filter((c) => VALID_CATEGORIES.includes(c))
 
   // 3. Invitar (crea el usuario en estado "invited" y le manda el mail).
   const { data: invited, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
@@ -70,6 +73,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   })
   if (linkError) {
     return res.status(500).json({ error: linkError.message })
+  }
+
+  // 5. Categorías a las que queda limitada la cuenta (solo aplica a
+  // Profesor — DT ve todo por su rol, Jugador resuelve la suya vía su
+  // jugador vinculado).
+  if (role === "profesor" && cleanCategories.length > 0) {
+    const { error: categoriesError } = await supabaseAdmin.from("profile_categories").insert(
+      cleanCategories.map((category) => ({ profile_id: invited.user.id, category }))
+    )
+    if (categoriesError) {
+      return res.status(500).json({ error: categoriesError.message })
+    }
   }
 
   return res.status(200).json({ ok: true, userId: invited.user.id })

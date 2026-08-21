@@ -6,6 +6,7 @@ import { z } from "zod"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useCreateNational, useNational, useUpdateNational } from "@/hooks/useNationals"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -28,6 +29,7 @@ export function NationalFormPage() {
   const { id } = useParams()
   const isEditing = Boolean(id)
   const navigate = useNavigate()
+  const { activeCategory } = useActiveCategory()
   const { data: national, isLoading } = useNational(id)
   const createNational = useCreateNational()
   const updateNational = useUpdateNational()
@@ -66,6 +68,7 @@ export function NationalFormPage() {
 
   async function onSubmit(values: NationalFormValues) {
     const payload = {
+      category: national?.category ?? activeCategory,
       name: values.name,
       city: values.city || null,
       start_date: values.start_date,

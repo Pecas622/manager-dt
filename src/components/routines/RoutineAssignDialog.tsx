@@ -3,6 +3,7 @@ import { toast } from "sonner"
 import { usePlayers } from "@/hooks/usePlayers"
 import { useCreateRoutineAssignment } from "@/hooks/useRoutines"
 import { useAuth } from "@/hooks/useAuth"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import { ROUTINE_ASSIGNMENT_TARGETS } from "@/types/domain"
 import type { RoutineAssignmentTarget } from "@/types/domain"
 import { Button } from "@/components/ui/button"
@@ -31,6 +32,7 @@ export function RoutineAssignDialog({
   defaultDate?: string
 }) {
   const { session } = useAuth()
+  const { activeCategory } = useActiveCategory()
   const { data: players } = usePlayers()
   const createAssignment = useCreateRoutineAssignment()
   const [date, setDate] = useState(defaultDate ?? new Date().toISOString().slice(0, 10))
@@ -53,6 +55,7 @@ export function RoutineAssignDialog({
     try {
       await createAssignment.mutateAsync({
         input: {
+          category: activeCategory,
           routine_id: routineId,
           date,
           assigned_to: assignedTo,

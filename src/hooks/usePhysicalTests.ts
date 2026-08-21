@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import type {
   PhysicalTest,
   PhysicalTestInsert,
@@ -9,12 +10,14 @@ import type {
 const PHYSICAL_TESTS_KEY = ["physical_tests"] as const
 
 export function usePhysicalTests() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: PHYSICAL_TESTS_KEY,
+    queryKey: [...PHYSICAL_TESTS_KEY, activeCategory],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("physical_tests")
-        .select("*, player:players(*), reps:physical_test_reps(*)")
+        .select("*, player:players!inner(*), reps:physical_test_reps(*)")
+        .eq("player.category", activeCategory)
         .order("date", { ascending: false })
       if (error) throw error
       return data as PhysicalTest[]

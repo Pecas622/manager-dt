@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/useAuth"
 import { NAV_GROUP_ORDER, NAV_ITEMS, type NavItem } from "@/components/layout/navItems"
+import { CategorySwitcher } from "@/components/layout/CategorySwitcher"
 
 function NavItemLink({ item }: { item: NavItem }) {
   return (
@@ -42,8 +43,12 @@ export function Sidebar() {
         </div>
         <div>
           <p className="text-sm font-semibold leading-tight">C15 Manager</p>
-          <p className="text-xs text-muted-foreground">Regatas C15</p>
+          <p className="text-xs text-muted-foreground">Regatas</p>
         </div>
+      </div>
+
+      <div className="px-3 pb-3">
+        <CategorySwitcher />
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3">

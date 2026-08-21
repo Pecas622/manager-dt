@@ -8,6 +8,14 @@ export const USER_ROLE_LABELS: Record<UserRole, string> = {
   coordinador: "Coordinador",
 }
 
+// Categorías del club — cada una se maneja como si fuera su propio equipo
+// (plantel, calendario, partidos, rutinas, evaluaciones, tests, Nacional
+// separados). El DT ve las 4 sin restricción; una cuenta Profesor puede
+// quedar limitada a una o más (tabla `profile_categories`); una cuenta
+// Jugador ve solo la de su propio jugador.
+export const CATEGORIES = ["C15", "C17", "C20", "Primera"] as const
+export type Category = (typeof CATEGORIES)[number]
+
 export const BECADO_STATUSES = ["Activo", "Inactivo"] as const
 export type BecadoStatus = (typeof BECADO_STATUSES)[number]
 

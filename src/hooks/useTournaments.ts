@@ -1,16 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import type { Match, Tournament, TournamentInsert, TournamentUpdate } from "@/types/database"
 
 const TOURNAMENTS_KEY = ["tournaments"] as const
 
 export function useTournaments() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: TOURNAMENTS_KEY,
+    queryKey: [...TOURNAMENTS_KEY, activeCategory],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tournaments")
         .select("*")
+        .eq("category", activeCategory)
         .order("start_date", { ascending: false, nullsFirst: false })
       if (error) throw error
       return data as Tournament[]

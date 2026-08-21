@@ -17,6 +17,7 @@ import {
 import { useCreateNationalActivity, useUpdateNationalActivity } from "@/hooks/useNationals"
 import { useCreateMatch } from "@/hooks/useMatches"
 import { useCreateRoutine, useRoutines } from "@/hooks/useRoutines"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import {
   NATIONAL_ACTIVITY_LABELS,
   NATIONAL_ACTIVITY_TYPES,
@@ -98,6 +99,7 @@ export function NationalActivityFormDialog({
   const navigate = useNavigate()
   const createActivity = useCreateNationalActivity()
   const updateActivity = useUpdateNationalActivity()
+  const { activeCategory } = useActiveCategory()
   const createMatch = useCreateMatch()
   const createRoutine = useCreateRoutine()
   const { data: routines } = useRoutines()
@@ -168,6 +170,7 @@ export function NationalActivityFormDialog({
 
       if (type === "partido") {
         const match = await createMatch.mutateAsync({
+          category: activeCategory,
           date,
           start_time: time || null,
           opponent: opponent.trim(),
@@ -182,6 +185,7 @@ export function NationalActivityFormDialog({
       } else if (type === "rutina") {
         if (routineChoice === NEW_ROUTINE_VALUE) {
           const routine = await createRoutine.mutateAsync({
+            category: activeCategory,
             name: newRoutineName.trim(),
             notes: null,
             created_by: null,

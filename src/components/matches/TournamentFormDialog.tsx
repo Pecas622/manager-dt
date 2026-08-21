@@ -9,6 +9,7 @@ import {
   useDeleteTournament,
   useUpdateTournament,
 } from "@/hooks/useTournaments"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import type { Tournament } from "@/types/database"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,6 +43,7 @@ export function TournamentFormDialog({
   tournament?: Tournament
   onCreated?: (tournament: Tournament) => void
 }) {
+  const { activeCategory } = useActiveCategory()
   const createTournament = useCreateTournament()
   const updateTournament = useUpdateTournament()
   const deleteTournament = useDeleteTournament()
@@ -74,6 +76,7 @@ export function TournamentFormDialog({
 
   async function onSubmit(values: TournamentFormValues) {
     const payload = {
+      category: tournament?.category ?? activeCategory,
       name: values.name,
       start_date: values.start_date || null,
       end_date: values.end_date || null,

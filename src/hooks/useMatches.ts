@@ -1,16 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import type { Match, MatchInsert, MatchUpdate } from "@/types/database"
 
 const MATCHES_KEY = ["matches"] as const
 
 export function useMatches() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: MATCHES_KEY,
+    queryKey: [...MATCHES_KEY, activeCategory],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("matches")
         .select("*")
+        .eq("category", activeCategory)
         .order("date", { ascending: false })
       if (error) throw error
       return data as Match[]

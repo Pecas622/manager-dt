@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import type {
   SessionExercise,
   SessionExerciseInsert,
@@ -18,12 +19,14 @@ export interface TrainingSessionDetail extends TrainingSession {
 }
 
 export function useTrainingSessions() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: SESSIONS_KEY,
+    queryKey: [...SESSIONS_KEY, activeCategory],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("training_sessions")
         .select("*, session_exercises(id)")
+        .eq("category", activeCategory)
         .order("date", { ascending: false })
       if (error) throw error
       return data as (TrainingSession & { session_exercises: { id: string }[] })[]
@@ -32,13 +35,15 @@ export function useTrainingSessions() {
 }
 
 export function useNextTrainingSession() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: [...SESSIONS_KEY, "next"],
+    queryKey: [...SESSIONS_KEY, activeCategory, "next"],
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10)
       const { data, error } = await supabase
         .from("training_sessions")
         .select("*")
+        .eq("category", activeCategory)
         .gte("date", today)
         .order("date", { ascending: true })
         .limit(1)
@@ -50,13 +55,15 @@ export function useNextTrainingSession() {
 }
 
 export function useRecentTrainingSessions(limit = 5) {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: [...SESSIONS_KEY, "recent", limit],
+    queryKey: [...SESSIONS_KEY, activeCategory, "recent", limit],
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10)
       const { data, error } = await supabase
         .from("training_sessions")
         .select("*, session_exercises(id)")
+        .eq("category", activeCategory)
         .lt("date", today)
         .order("date", { ascending: false })
         .limit(limit)

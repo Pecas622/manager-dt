@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { useCreateRoutine } from "@/hooks/useRoutines"
 import { useAuth } from "@/hooks/useAuth"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,6 +23,7 @@ type RoutineFormValues = z.infer<typeof routineSchema>
 export function RoutineFormPage() {
   const navigate = useNavigate()
   const { session } = useAuth()
+  const { activeCategory } = useActiveCategory()
   const createRoutine = useCreateRoutine()
 
   const {
@@ -36,6 +38,7 @@ export function RoutineFormPage() {
   async function onSubmit(values: RoutineFormValues) {
     try {
       const created = await createRoutine.mutateAsync({
+        category: activeCategory,
         name: values.name,
         notes: values.notes || null,
         created_by: session?.user.id ?? null,

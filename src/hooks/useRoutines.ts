@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabaseClient"
+import { useActiveCategory } from "@/hooks/useActiveCategory"
 import type {
   PhysicalExercise,
   PhysicalExerciseInsert,
@@ -101,13 +102,15 @@ export function useDeletePhysicalExercise() {
 // ---------- Rutinas ----------
 
 export function useRoutines() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: ROUTINES_KEY,
+    queryKey: [...ROUTINES_KEY, activeCategory],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("routines")
         .select("*, routine_exercises(id)")
         .is("player_id", null)
+        .eq("category", activeCategory)
         .order("name", { ascending: true })
       if (error) throw error
       return data as (Routine & { routine_exercises: { id: string }[] })[]
@@ -147,13 +150,17 @@ export function useRoutine(id: string | undefined) {
 // ---------- Planes individuales (rutinas con player_id) ----------
 
 export function usePlans() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: PLANS_KEY,
+    queryKey: [...PLANS_KEY, activeCategory],
     queryFn: async () => {
+      // Un plan no tiene category propia — hereda la del jugador. `!inner`
+      // fuerza el join para poder filtrar por una columna del embed.
       const { data, error } = await supabase
         .from("routines")
-        .select("*, player:players(*), routine_exercises(id)")
+        .select("*, player:players!inner(*), routine_exercises(id)")
         .not("player_id", "is", null)
+        .eq("player.category", activeCategory)
         .order("created_at", { ascending: false })
       if (error) throw error
       return data as (Routine & { routine_exercises: { id: string }[] })[]
@@ -195,6 +202,7 @@ export function useDuplicatePlan() {
       const { data: newPlan, error: createError } = await supabase
         .from("routines")
         .insert({
+          category: source.category,
           player_id: source.player_id,
           name: `${source.name} (copia)`,
           notes: source.notes,
@@ -484,12 +492,14 @@ export function useRemoveRoutineExercise() {
 // ---------- Asignaciones ----------
 
 export function useRoutineAssignments() {
+  const { activeCategory } = useActiveCategory()
   return useQuery({
-    queryKey: ROUTINE_ASSIGNMENTS_KEY,
+    queryKey: [...ROUTINE_ASSIGNMENTS_KEY, activeCategory],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("routine_assignments")
         .select("*, routine:routines(*), routine_assignment_players(player_id)")
+        .eq("category", activeCategory)
         .order("date", { ascending: false })
       if (error) throw error
       return data as RoutineAssignment[]
